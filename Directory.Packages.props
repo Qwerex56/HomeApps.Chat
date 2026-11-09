@@ -1,0 +1,31 @@
+<Project>
+  <!-- Central package versions. Projects reference packages without a version. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- The HomeApps version the plugin is built against (local feed, see nuget.config). -->
+    <HomeAppsVersion>2.2.0</HomeAppsVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="HomeApps kit">
+    <PackageVersion Include="HomeApps.BuildingBlocks.Domain" Version="$(HomeAppsVersion)" />
+    <PackageVersion Include="HomeApps.Contracts" Version="$(HomeAppsVersion)" />
+    <PackageVersion Include="HomeApps.Plugins" Version="$(HomeAppsVersion)" />
+    <PackageVersion Include="HomeApps.Plugins.Hosting" Version="$(HomeAppsVersion)" />
+    <PackageVersion Include="HomeApps.BuildingBlocks.Testing" Version="$(HomeAppsVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Label="Core">
+    <PackageVersion Include="FluentResults" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Microsoft">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+  </ItemGroup>
+</Project>
