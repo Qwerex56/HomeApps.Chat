@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Chat domain: conversations, messages, attachments and read markers of one household. Only the kit's domain
+       building blocks (errors, HouseholdRole from the contracts) and FluentResults. -->
+  <ItemGroup>
+    <PackageReference Include="HomeApps.BuildingBlocks.Domain" />
+    <PackageReference Include="FluentResults" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Chat.Domain.Tests" />
+  </ItemGroup>
+
+</Project>
