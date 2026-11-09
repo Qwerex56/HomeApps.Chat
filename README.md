@@ -9,8 +9,8 @@ z lokalnego feedu) oraz kontraktu pluginów (`docs/plugins.md` w HomeApps). Plan
 | Etap | Co | Stan |
 |---|---|---|
 | C1 `chat/domain` | `Conversation` (dom, pokoje, 1:1), `Message`, `Attachment`, `ReadMarker` + testy | gotowe |
-| C2 `chat/api` | Application, Infrastructure, Api (port 5410), hub SignalR, media | dalej |
-| C3 `chat/web` | UI pluginu i widżet | |
+| C2 `chat/api` | Application, Infrastructure, Api (port 5410), hub SignalR, media | gotowe |
+| C3 `chat/web` | UI pluginu i widżet | dalej |
 | C4 `chat/docker` | obraz z `ffmpeg`, `compose.yaml`, wolumin `chat_media` | |
 
 ## Wymagania
@@ -24,6 +24,26 @@ z lokalnego feedu) oraz kontraktu pluginów (`docs/plugins.md` w HomeApps). Plan
 ```bash
 dotnet test
 ```
+
+Testy API potrzebują Dockera (Postgres z Testcontainers) i `ffmpeg`/`ffprobe` na `PATH` (`brew install ffmpeg`).
+
+## Uruchomienie w dev
+
+`dotnet run --project src/Chat.Api` startuje na `http://localhost:5410` (Postgres i RabbitMQ z `compose.yaml` HomeApps,
+Auth na 5100, Households na 5300). Pliki trafiają do `src/Chat.Api/media/`, klucz podpisu linków jest w
+`appsettings.Development.json`; w produkcji `Chat__Media__SigningKey` (C4: `CHAT_MEDIA_SIGNING_KEY` w `.env`).
+
+## API w skrócie
+
+Wszystko pod `/plugins/chat/api/households/{hid}` (tabela w [planie, sekcja 6](docs/plan.md)):
+`conversations` (lista z licznikami, `direct`, `read`, `mute`, `messages` z `before`/`after`), `rooms` (zakładanie,
+nazwa, uczestnicy, `leave` z `successorId`, `archive`), `messages/{id}` (edycja, usunięcie, `reactions/{emoji}`),
+`attachments` (multipart, odpowiedź `202`, potem `AttachmentChanged`), `unread`, `storage`. Pliki:
+`/plugins/chat/media/{id}/{original|preview|thumb}?exp=&sig=` (bez tokenu, z podpisem, `Range`).
+
+Hub `/plugins/chat/hub` (`?access_token=`): `Watch(householdId)`, `Open(conversationId?)`, `Typing(householdId,
+conversationId)`; do klienta idą małe sygnały z samymi id: `MessageSent`, `MessageEdited`, `MessageDeleted`,
+`ReactionChanged`, `ReadMarkerMoved`, `ConversationChanged`, `AttachmentChanged`, `Typing`, `AccessChanged`.
 
 ## Domena w skrócie
 

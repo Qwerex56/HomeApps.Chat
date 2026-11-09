@@ -308,3 +308,12 @@ Bez pytania przyjmuję: emoji z klawiatury systemu, brak wyszukiwania i przypina
 - 2026-11-09: C1 `chat/domain`: cztery agregaty i 51 testów domeny. Uwagi z budowy: rozmowa 1:1 z osobą, która wyszła z domu, zostaje do odczytu (zarchiwizowana).
 - 2026-11-09: decyzja właściciela: wychodzący opiekun sam wybiera następnego opiekuna (`conversation.successor_required`,
   `conversation.successor_invalid`); przy usunięciu z domu opiekunem zostaje najdłużej obecny uczestnik, który może pisać.
+- 2026-11-09: C2 `chat/api`: Application (komendy i zapytania w osobnych folderach), Infrastructure (Postgres,
+  migracja `Initial`, pliki na dysku, SkiaSharp i ffmpeg, linki HMAC, sprzątanie, konsumenci `MemberLeft`,
+  `MemberRoleChanged`, `UserErased`), Api (port 5410, hub, limity 30/min i 20/10 min), 34 testy API i huba. Uwagi z
+  budowy: wyciszenie rozmowy to osobny agregat `Mute` (`PUT/DELETE .../mute`); wyjście z pokoju to
+  `POST /rooms/{cid}/leave` z `successorId`; gdy opiekun wypada z domu albo traci `chat.write`, następcą zostaje
+  najdłużej obecny uczestnik, który coś napisał w pokoju (goście nie piszą), a bez takiego najdłużej obecny; sygnały huba
+  niosą tylko id, treść klient pobiera zwykłym GET (Gość nie dostanie cytatu sprzed dołączenia); film: oryginał zostaje
+  zastąpiony wersją po remuksie bez metadanych (iPhone trzyma GPS w osobnej ścieżce), podgląd to ten sam plik;
+  link do powiadomienia: `/homes/{hid}/apps/chat/c/{cid}` (C3 musi mieć taką trasę). Za Traefikiem sprawdzę przy C4.

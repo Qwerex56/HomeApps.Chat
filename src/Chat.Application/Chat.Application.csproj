@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Chat use cases: the manifest, one folder per command or query (command, validator, handler) and the ports for Infrastructure and the hub. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Chat.Domain\Chat.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HomeApps.Plugins" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Chat.Api.Tests" />
+  </ItemGroup>
+
+</Project>

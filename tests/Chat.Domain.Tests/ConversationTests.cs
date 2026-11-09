@@ -235,4 +235,17 @@ public sealed class ConversationTests
         Assert.Equal(writer.UserId, room.KeeperId);
         Assert.Equal(first.UserId, other.KeeperId);
     }
+
+    [Fact]
+    public void A_keeper_who_may_no_longer_write_stays_but_hands_the_room_on()
+    {
+        var keeper = A.Member();
+        var other = A.Member();
+        var room = A.Room(keeper, _time, other.UserId);
+
+        room.KeeperLostWriting(keeper.UserId, null);
+
+        Assert.True(room.IsParticipant(keeper.UserId));
+        Assert.Equal(other.UserId, room.KeeperId);
+    }
 }

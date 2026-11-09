@@ -78,6 +78,9 @@ public static class ChatErrors
     public static Error AttachmentNotReady => new AppError("attachment.not_ready",
         "The photo or video is still being checked, or was not accepted.", ErrorKind.Conflict);
 
+    public static Error StorageFull => new AppError("chat.storage_full",
+        "The household has used all the space for photos and videos; text messages still work.", ErrorKind.Conflict);
+
     public static Error AttachmentNotPending => new AppError("attachment.not_pending",
         "The attachment was already checked.", ErrorKind.Conflict);
 }

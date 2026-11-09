@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- The plugin's host: kit pipeline under /plugins/chat, the endpoints, the SignalR hub and the signed media links. The UI joins in C3. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Chat.Infrastructure\Chat.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Chat.Api.Tests" />
+  </ItemGroup>
+
+</Project>

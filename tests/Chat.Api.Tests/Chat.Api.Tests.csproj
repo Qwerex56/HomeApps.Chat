@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The plugin end to end: real Postgres (Testcontainers, needs Docker), in-memory bus, Households faked over HTTP, ffmpeg on the PATH. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Chat.Api\Chat.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HomeApps.BuildingBlocks.Testing" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
+  </ItemGroup>
+
+</Project>

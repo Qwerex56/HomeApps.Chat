@@ -307,13 +307,7 @@ public sealed class Conversation
         switch (Kind)
         {
             case ConversationKind.Room when IsParticipant(userId):
-                if (KeeperId == userId)
-                {
-                    KeeperId = successor is { } next && next != userId && IsParticipant(next)
-                        ? next
-                        : _participants.Where(p => p.UserId != userId).OrderBy(p => p.AddedAt).Select(p => (Guid?)p.UserId).FirstOrDefault();
-                }
-
+                PassKeeper(userId, successor);
                 Remove(userId);
                 ArchiveIfEmpty(time);
                 break;
@@ -321,6 +315,30 @@ public sealed class Conversation
                 ArchivedAt = time.GetUtcNow();
                 break;
         }
+    }
+
+    /// <summary>
+    /// The keeper's role in the household dropped below <c>chat.write</c> (they can no longer rename or archive), so the
+    /// room goes on like after <see cref="MemberLeft"/>; they stay a participant and read on.
+    /// </summary>
+    public void KeeperLostWriting(Guid userId, Guid? successor)
+    {
+        if (Kind == ConversationKind.Room && KeeperId == userId && _participants.Count > 1)
+        {
+            PassKeeper(userId, successor);
+        }
+    }
+
+    private void PassKeeper(Guid from, Guid? successor)
+    {
+        if (KeeperId != from)
+        {
+            return;
+        }
+
+        KeeperId = successor is { } next && next != from && IsParticipant(next)
+            ? next
+            : _participants.Where(p => p.UserId != from).OrderBy(p => p.AddedAt).Select(p => (Guid?)p.UserId).FirstOrDefault();
     }
 
     private Result CanChangeRoom(Actor actor)
