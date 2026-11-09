@@ -36,7 +36,7 @@ public sealed class Conversation
     /// <summary>Only rooms have a name; the household's is <see cref="HouseholdName"/>, a direct one shows the other person.</summary>
     public RoomName? Name { get; private set; }
 
-    /// <summary>A room's keeper: renames, removes others and archives (C13). The creator, then the longest present.</summary>
+    /// <summary>A room's keeper: renames, removes others and archives (C13). The creator, then whoever the leaving keeper chose.</summary>
     public Guid? KeeperId { get; private set; }
 
     /// <summary>Rooms and direct conversations only; the household's conversation lists nobody.</summary>
@@ -244,8 +244,11 @@ public sealed class Conversation
         return Result.Ok();
     }
 
-    /// <summary>Anyone leaves a room (C13). A keeper who leaves hands the room to the longest present; the last one archives it.</summary>
-    public Result Leave(Actor actor, TimeProvider time)
+    /// <summary>
+    /// Anyone leaves a room (C13). A keeper who leaves while others stay chooses the next keeper among them
+    /// (<paramref name="successor"/>; the Application layer checks they may write); the last one out archives the room.
+    /// </summary>
+    public Result Leave(Actor actor, Guid? successor, TimeProvider time)
     {
         ArgumentNullException.ThrowIfNull(actor);
         ArgumentNullException.ThrowIfNull(time);
@@ -257,6 +260,21 @@ public sealed class Conversation
         if (!IsParticipant(actor.UserId))
         {
             return Result.Fail(ChatErrors.ConversationNotFound);
+        }
+
+        if (KeeperId == actor.UserId && _participants.Count > 1)
+        {
+            if (successor is not { } next)
+            {
+                return Result.Fail(ChatErrors.SuccessorRequired);
+            }
+
+            if (next == actor.UserId || !IsParticipant(next))
+            {
+                return Result.Fail(ChatErrors.SuccessorInvalid);
+            }
+
+            KeeperId = next;
         }
 
         Remove(actor.UserId);
@@ -278,16 +296,24 @@ public sealed class Conversation
     }
 
     /// <summary>
-    /// The person left the household (<c>MemberLeft</c>): out of every room, with the keeper handed on and an empty room
-    /// archived; a direct conversation with them stays readable for the other person but takes no new messages. Their
-    /// messages stay (C5).
+    /// The person left the household (<c>MemberLeft</c>): out of every room and an empty room archived; a direct
+    /// conversation with them stays readable for the other person but takes no new messages. Their messages stay (C5).
+    /// A keeper removed from the household had no chance to choose, so the room goes to <paramref name="successor"/>
+    /// (the Application layer picks the longest present who may write) or, without one, to the longest present.
     /// </summary>
-    public void MemberLeft(Guid userId, TimeProvider time)
+    public void MemberLeft(Guid userId, Guid? successor, TimeProvider time)
     {
         ArgumentNullException.ThrowIfNull(time);
         switch (Kind)
         {
             case ConversationKind.Room when IsParticipant(userId):
+                if (KeeperId == userId)
+                {
+                    KeeperId = successor is { } next && next != userId && IsParticipant(next)
+                        ? next
+                        : _participants.Where(p => p.UserId != userId).OrderBy(p => p.AddedAt).Select(p => (Guid?)p.UserId).FirstOrDefault();
+                }
+
                 Remove(userId);
                 ArchiveIfEmpty(time);
                 break;
@@ -326,7 +352,7 @@ public sealed class Conversation
         _participants.RemoveAll(p => p.UserId == userId);
         if (KeeperId == userId)
         {
-            KeeperId = _participants.OrderBy(p => p.AddedAt).Select(p => (Guid?)p.UserId).FirstOrDefault();
+            KeeperId = null;
         }
     }
 

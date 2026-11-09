@@ -29,6 +29,12 @@ public static class ChatErrors
     public static Error ParticipantsInvalid => new AppError("conversation.participants_invalid",
         "Choose people from the household who are not in the room yet (to leave, use leave).", ErrorKind.Validation);
 
+    public static Error SuccessorRequired => new AppError("conversation.successor_required",
+        "The keeper chooses who keeps the room before leaving.", ErrorKind.Validation);
+
+    public static Error SuccessorInvalid => new AppError("conversation.successor_invalid",
+        "The next keeper must be another participant of the room who may write.", ErrorKind.Validation);
+
     public static Error DirectWithSelf => new AppError("conversation.direct_invalid",
         "A direct conversation needs another person.", ErrorKind.Validation);
 

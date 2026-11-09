@@ -92,7 +92,7 @@ public sealed class ConversationTests
     }
 
     [Fact]
-    public void A_keeper_who_leaves_hands_the_room_to_the_longest_present_and_the_last_one_archives_it()
+    public void A_keeper_who_leaves_chooses_the_next_keeper_and_the_last_one_archives_the_room()
     {
         var keeper = A.Member();
         var first = A.Member();
@@ -101,16 +101,30 @@ public sealed class ConversationTests
         var later = A.Member();
         room.AddParticipants(keeper, [later.UserId], _time);
 
-        Assert.True(room.Leave(keeper, _time).IsSuccess);
-        Assert.Equal(first.UserId, room.KeeperId);
+        Assert.True(room.Leave(keeper, later.UserId, _time).IsSuccess);
+        Assert.Equal(later.UserId, room.KeeperId);
 
-        room.Leave(first, _time);
+        Assert.True(room.Leave(first, null, _time).IsSuccess);
         Assert.Equal(later.UserId, room.KeeperId);
         Assert.False(room.IsArchived);
 
-        room.Leave(later, _time);
+        room.Leave(later, null, _time);
         Assert.Null(room.KeeperId);
         Assert.True(room.IsArchived);
+    }
+
+    [Fact]
+    public void A_keeper_cannot_leave_others_without_a_keeper_or_hand_the_room_to_an_outsider()
+    {
+        var keeper = A.Member();
+        var other = A.Member();
+        var room = A.Room(keeper, _time, other.UserId);
+
+        Assert.Equal("conversation.successor_required", room.Leave(keeper, null, _time).Code());
+        Assert.Equal("conversation.successor_invalid", room.Leave(keeper, Guid.NewGuid(), _time).Code());
+        Assert.Equal("conversation.successor_invalid", room.Leave(keeper, keeper.UserId, _time).Code());
+        Assert.True(room.IsParticipant(keeper.UserId));
+        Assert.Equal(keeper.UserId, room.KeeperId);
     }
 
     [Fact]
@@ -120,7 +134,7 @@ public sealed class ConversationTests
         var member = A.Member();
 
         Assert.Equal("conversation.not_a_room", home.AddParticipants(member, [Guid.NewGuid()], _time).Code());
-        Assert.Equal("conversation.not_a_room", home.Leave(member, _time).Code());
+        Assert.Equal("conversation.not_a_room", home.Leave(member, null, _time).Code());
         Assert.Equal("conversation.not_a_room", home.Rename(member, "Nowa").Code());
     }
 
@@ -130,7 +144,7 @@ public sealed class ConversationTests
         var room = A.Room(A.Member(), _time);
 
         Assert.Equal("conversation.not_found", room.AddParticipants(A.Member(), [Guid.NewGuid()], _time).Code());
-        Assert.Equal("conversation.not_found", room.Leave(A.Member(), _time).Code());
+        Assert.Equal("conversation.not_found", room.Leave(A.Member(), null, _time).Code());
     }
 
     [Fact]
@@ -172,7 +186,7 @@ public sealed class ConversationTests
         Assert.True(direct.CanWrite(b).IsSuccess);
         Assert.Equal("conversation.not_found", direct.CanRead(A.Member()).Code());
         Assert.Equal("conversation.direct_invalid", Conversation.StartDirect(A.Household, a, a.UserId, _time).Code());
-        Assert.Equal("conversation.not_a_room", direct.Leave(a, _time).Code());
+        Assert.Equal("conversation.not_a_room", direct.Leave(a, null, _time).Code());
     }
 
     [Fact]
@@ -183,8 +197,8 @@ public sealed class ConversationTests
         var room = A.Room(keeper, _time, other.UserId);
         var direct = Conversation.StartDirect(A.Household, keeper, other.UserId, _time).Value;
 
-        room.MemberLeft(keeper.UserId, _time);
-        direct.MemberLeft(keeper.UserId, _time);
+        room.MemberLeft(keeper.UserId, null, _time);
+        direct.MemberLeft(keeper.UserId, null, _time);
 
         Assert.False(room.IsParticipant(keeper.UserId));
         Assert.Equal(other.UserId, room.KeeperId);
@@ -202,5 +216,23 @@ public sealed class ConversationTests
         home.MessageArrived(A.Now.AddMinutes(1));
 
         Assert.Equal(A.Now.AddMinutes(2), home.LastMessageAt);
+    }
+
+    [Fact]
+    public void A_keeper_removed_from_the_household_leaves_the_room_to_the_given_successor_or_the_longest_present()
+    {
+        var keeper = A.Member();
+        var first = A.Member();
+        var room = A.Room(keeper, _time, first.UserId);
+        _time.Advance(TimeSpan.FromMinutes(5));
+        var writer = A.Member();
+        room.AddParticipants(keeper, [writer.UserId], _time);
+        var other = A.Room(keeper, _time, first.UserId);
+
+        room.MemberLeft(keeper.UserId, writer.UserId, _time);
+        other.MemberLeft(keeper.UserId, Guid.NewGuid(), _time);
+
+        Assert.Equal(writer.UserId, room.KeeperId);
+        Assert.Equal(first.UserId, other.KeeperId);
     }
 }

@@ -29,7 +29,7 @@ dotnet test
 
 - **`Conversation`**: „Dom” (nikogo nie wypisuje, decyduje członkostwo w domu), **pokój** (nazwa do 60 znaków,
   uczestnicy, opiekun: zmienia nazwę, usuwa innych, archiwizuje; dodawać może każdy uczestnik; wyjść może każdy,
-  ostatni archiwizuje) i **1:1** (jedna na parę osób). Pokoje i 1:1 czytają tylko uczestnicy, także nie Owner domu.
+  opiekun przy wyjściu wskazuje następcę, ostatni archiwizuje) i **1:1** (jedna na parę osób). Pokoje i 1:1 czytają tylko uczestnicy, także nie Owner domu.
 - **`Message`**: Markdown do 4000 znaków zapisany surowo, do 10 załączników, odpowiedź na wiadomość z tej samej
   rozmowy, edycja przez autora zawsze z „(edytowano)”, usunięcie przez autora albo moderatora w rozmowie „Dom”
   (zostaje „Wiadomość usunięta”), reakcje: jedno emoji raz na osobę. `ClientMessageId` chroni przed duplikatem po

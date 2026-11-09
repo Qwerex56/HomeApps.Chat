@@ -107,7 +107,7 @@ Cztery agregaty, bo każdy zmienia się w innym rytmie (rozmowa rzadko, wiadomo�
 
 **Gość (C3 ✅):** tylko czyta, nigdzie nie pisze ani nie reaguje (też w pokojach, do których go dodano). Widzi wiadomości najwyżej od dnia dołączenia do domu (`JoinedAt` z `GET /households/{id}/members/me`; w pokoju: od chwili dodania, jeśli późniejsza). Granica działa też w API: `before=` nie zwróci nic starszego, a cytat w odpowiedzi na starszą wiadomość pokaże się jako "Starsza wiadomość". Gość, który wyszedł i wrócił, widzi od nowego dołączenia. Domownik i wyżej widzi całą historię.
 
-Reguły w domenie (nie w handlerach): autor edytuje tylko swoje; limit załączników; uczestnicy pokoju i rozmowy `Direct` tylko spośród członków tego samego domu; pokój bez uczestników się archiwizuje, a gdy opiekun wychodzi, opiekunem zostaje najdłużej obecny uczestnik; po `MemberLeft` osoba traci dostęp do wszystkiego w tym domu, jej wiadomości zostają (C5); zarchiwizowana rozmowa jest tylko do odczytu.
+Reguły w domenie (nie w handlerach): autor edytuje tylko swoje; limit załączników; uczestnicy pokoju i rozmowy `Direct` tylko spośród członków tego samego domu; pokój bez uczestników się archiwizuje, a gdy opiekun wychodzi, sam wybiera następnego opiekuna spośród uczestników mogących pisać (bez wyboru nie wyjdzie; gdy zostaje usunięty z domu, opiekunem zostaje najdłużej obecny uczestnik z `chat.write`); po `MemberLeft` osoba traci dostęp do wszystkiego w tym domu, jej wiadomości zostają (C5); zarchiwizowana rozmowa jest tylko do odczytu.
 
 ## 3. Uprawnienia (manifest)
 
@@ -199,7 +199,7 @@ Endpoint mediów jest anonimowy, ale sprawdza podpis i termin, obsługuje `Range
 | PUT | `/households/{hid}/rooms/{cid}` `{ name }` | opiekun |
 | POST | `/households/{hid}/rooms/{cid}/participants` `{ userIds[] }` | uczestnik z `chat.rooms` |
 | DELETE | `/households/{hid}/rooms/{cid}/participants/{userId}` | opiekun |
-| DELETE | `/households/{hid}/rooms/{cid}/participants/me` | uczestnik (wyjście) |
+| POST | `/households/{hid}/rooms/{cid}/leave` `{ successorId? }` | uczestnik (wyjście; opiekun podaje następcę) |
 | POST | `/households/{hid}/rooms/{cid}/archive` | opiekun |
 | GET | `/households/{hid}/conversations/{cid}/messages?before=&after=&limit=50` | `chat.read` (kursor po UUIDv7) |
 | POST | `/households/{hid}/conversations/{cid}/messages` `{ clientMessageId, text?, attachmentIds[], replyToId? }` | `chat.write` |
@@ -305,6 +305,6 @@ Bez pytania przyjmuję: emoji z klawiatury systemu, brak wyszukiwania i przypina
 ## Postęp
 
 - 2026-11-09: Etap 0 (powiadomienia, HomeApps `dde1610`) i Etap A (realtime, HomeApps `354de68`) zmergowane.
-- 2026-11-09: C1 `chat/domain`: cztery agregaty i 51 testów domeny. Uwagi z budowy: nowy opiekun pokoju to najdłużej
-  obecny uczestnik (także Gość, wtedy nikt nie zmienia nazwy, dopóki ktoś nie wyjdzie: do poprawy w C2, jeśli będzie
-  przeszkadzać); rozmowa 1:1 z osobą, która wyszła z domu, zostaje do odczytu (zarchiwizowana).
+- 2026-11-09: C1 `chat/domain`: cztery agregaty i 51 testów domeny. Uwagi z budowy: rozmowa 1:1 z osobą, która wyszła z domu, zostaje do odczytu (zarchiwizowana).
+- 2026-11-09: decyzja właściciela: wychodzący opiekun sam wybiera następnego opiekuna (`conversation.successor_required`,
+  `conversation.successor_invalid`); przy usunięciu z domu opiekunem zostaje najdłużej obecny uczestnik, który może pisać.
