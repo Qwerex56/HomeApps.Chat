@@ -8,7 +8,7 @@ namespace Chat.Api.Tests;
 public sealed class ConversationTests(ChatFactory factory) : IClassFixture<ChatFactory>
 {
     [Fact]
-    public async Task The_manifest_declares_permissions_the_hub_and_message_notifications()
+    public async Task The_manifest_declares_permissions_the_hub_notifications_and_the_UI()
     {
         var json = (await factory.CreateClient().GetFromJsonAsync<JsonNode>("/plugins/chat/manifest"))!;
 
@@ -18,6 +18,18 @@ public sealed class ConversationTests(ChatFactory factory) : IClassFixture<ChatF
             json["permissions"]!.AsArray().Select(p => p!["id"]!.GetValue<string>()));
         Assert.Equal("/plugins/chat/hub", json["endpoints"]!["realtime"]!.GetValue<string>());
         Assert.Equal("message", json["notifications"]![0]!["id"]!.GetValue<string>());
+        Assert.Equal("/plugins/chat/ui/entry.js", json["ui"]!["entry"]!.GetValue<string>());
+        var widget = json["ui"]!["widgets"]![0]!;
+        Assert.Equal(("chat", "Medium"), (widget["id"]!.GetValue<string>(), widget["size"]!.GetValue<string>()));
+        Assert.Equal(["Household"], widget["places"]!.AsArray().Select(p => p!.GetValue<string>()));
+    }
+
+    [Fact]
+    public async Task The_built_UI_is_served()
+    {
+        var response = await factory.CreateClient().GetAsync("/plugins/chat/ui/entry.js");
+
+        Assert.True(response.IsSuccessStatusCode);
     }
 
     [Fact]

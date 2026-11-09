@@ -316,4 +316,11 @@ Bez pytania przyjmuję: emoji z klawiatury systemu, brak wyszukiwania i przypina
   najdłużej obecny uczestnik, który coś napisał w pokoju (goście nie piszą), a bez takiego najdłużej obecny; sygnały huba
   niosą tylko id, treść klient pobiera zwykłym GET (Gość nie dostanie cytatu sprzed dołączenia); film: oryginał zostaje
   zastąpiony wersją po remuksie bez metadanych (iPhone trzyma GPS w osobnej ścieżce), podgląd to ten sam plik;
-  link do powiadomienia: `/homes/{hid}/apps/chat/c/{cid}` (C3 musi mieć taką trasę). Za Traefikiem sprawdzę przy C4.
+  link do powiadomienia: `/homes/{hid}/apps/chat?c={cid}` (w C3 zmienione z `/c/{cid}`: strony pluginów w HomeApps nie mają parametrów w ścieżce, strona czyta `?c=`). Za Traefikiem sprawdzę przy C4.
+- 2026-11-09: C3 `chat/web`: `src/Chat.Web` (Vue, SignalR, markdown-it + DOMPurify), manifest z UI (strona `""`, widżet
+  `chat` Medium tylko na stronie domu), build w `Chat.Api/wwwroot/ui`, 18 testów vitest. Sprawdzone w Chromium na dwóch
+  kontach naraz (pisanie, wiadomość, zdjęcie i film bez odświeżania, reakcja, cytat, edycja, pokój, zmiana nazwy,
+  wyjście opiekuna z następcą, wyciszenie), jako Gość i na telefonie (Pixel 7). Uwagi z budowy: rozmowa na ekranie jest w
+  `?c=` (stąd zmiana linku powiadomienia); komunikaty w rozmowie o zmianach w pokoju są lokalne (widzi je ten, kto ma
+  pokój otwarty), bo serwer nie zapisuje wiadomości systemowych; reakcje i menu wiadomości są pod „…” (na telefonie
+  zawsze widoczne); film za długi albo za duży odpada przed wysłaniem, gdy przeglądarka umie odczytać jego długość.

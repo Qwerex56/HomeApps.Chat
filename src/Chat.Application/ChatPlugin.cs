@@ -5,8 +5,8 @@ using HomeApps.Plugins.Manifest;
 namespace Chat.Application;
 
 /// <summary>
-/// The chat plugin's manifest (plan section 3, docs/plugins.md in HomeApps). The UI (src/Chat.Web) joins it in C3, so the
-/// web app never tries to load what is not there yet; MCP comes after 1.0 (C5).
+/// The chat plugin's manifest (plan section 3, docs/plugins.md in HomeApps). The UI is src/Chat.Web, built into
+/// Chat.Api/wwwroot/ui; MCP comes after 1.0 (C5).
 /// </summary>
 public static class ChatPlugin
 {
@@ -31,6 +31,9 @@ public static class ChatPlugin
     /// <summary>Where the realtime hub lives, under <c>/plugins/chat</c>.</summary>
     public const string Hub = "hub";
 
+    /// <summary>The widget on the household's page: the last messages of "Dom" and the unread count.</summary>
+    public const string Widget = "chat";
+
     public static PluginManifest Manifest { get; } = new()
     {
         Id = "chat",
@@ -50,6 +53,12 @@ public static class ChatPlugin
             new PluginPermission(Moderate, HouseholdRole.Admin, new LocalizedText("Usuwanie cudzych wiadomości w rozmowie domu", "Delete others' messages in the household's conversation")),
         ],
         Realtime = Hub,
+        Ui = new PluginUi
+        {
+            Routes = [new PluginRoute("", new LocalizedText("Czat", "Chat"))],
+            // The household's page only: on /wall the chat would be read by whoever walks by (C12).
+            Widgets = [new PluginWidget(Widget, new LocalizedText("Czat", "Chat"), WidgetSize.Medium, [WidgetPlace.Household])],
+        },
         Notifications = [new PluginNotificationCategory(MessageNotification, new LocalizedText("Wiadomości", "Messages"))],
         Events = new PluginEvents([], [typeof(MemberLeft), typeof(MemberRoleChanged), typeof(UserErased)]),
     };

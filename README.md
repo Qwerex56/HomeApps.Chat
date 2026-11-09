@@ -10,8 +10,8 @@ z lokalnego feedu) oraz kontraktu pluginów (`docs/plugins.md` w HomeApps). Plan
 |---|---|---|
 | C1 `chat/domain` | `Conversation` (dom, pokoje, 1:1), `Message`, `Attachment`, `ReadMarker` + testy | gotowe |
 | C2 `chat/api` | Application, Infrastructure, Api (port 5410), hub SignalR, media | gotowe |
-| C3 `chat/web` | UI pluginu i widżet | dalej |
-| C4 `chat/docker` | obraz z `ffmpeg`, `compose.yaml`, wolumin `chat_media` | |
+| C3 `chat/web` | UI pluginu (`src/Chat.Web`) i widżet | gotowe |
+| C4 `chat/docker` | obraz z `ffmpeg`, `compose.yaml`, wolumin `chat_media` | dalej |
 
 ## Wymagania
 
@@ -26,6 +26,20 @@ dotnet test
 ```
 
 Testy API potrzebują Dockera (Postgres z Testcontainers) i `ffmpeg`/`ffprobe` na `PATH` (`brew install ffmpeg`).
+
+## UI (`src/Chat.Web`)
+
+Vue wg `docs/plugins.md` HomeApps („UI”): strona czatu i widżet „Czat” (tylko strona domu). Zbudowany moduł leży w
+`src/Chat.Api/wwwroot/ui` i jest w repo, więc sam .NET wystarcza do uruchomienia. Po zmianach w UI:
+
+```bash
+cd src/Chat.Web
+npm install
+npm test        # vitest: Markdown, oś czasu, sprawdzanie plików
+npm run build   # vue-tsc + vite → ../Chat.Api/wwwroot/ui
+```
+
+Rozmowę na ekranie trzyma adres (`/homes/{hid}/apps/chat?c={cid}`), tam też prowadzi powiadomienie.
 
 ## Uruchomienie w dev
 

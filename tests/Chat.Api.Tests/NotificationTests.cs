@@ -21,7 +21,7 @@ public sealed class NotificationTests(ChatFactory factory) : IClassFixture<ChatF
         var sent = Assert.Single(factory.Published.OfType<NotificationRequested>(), n => n.HouseholdId == h.Id);
         Assert.Equal(new[] { h.Owner, h.Guest }.Order(), sent.UserIds.Order());
         Assert.Equal(("chat", "message", "Dom", "Ania: Obiad gotowy!"), (sent.Source, sent.Category, sent.Title, sent.Body));
-        Assert.Equal($"/homes/{h.Id}/apps/chat/c/{home}", sent.Url);
+        Assert.Equal($"/homes/{h.Id}/apps/chat?c={home}", sent.Url);
         Assert.Equal("Nowa wiadomość w Dom", sent.BodyWhenHidden);
     }
 

@@ -12,7 +12,8 @@ namespace Chat.Application.Notifications;
 /// Push notifications for a new message (plan 5, Etap 0): everyone who reads the conversation except the author, those
 /// who silenced it and those who have it open right now. One notification per conversation (<c>Tag</c>), so the next
 /// message replaces it. Plain text, never Markdown (9a). The names come from Households with the author's token; if
-/// Households does not answer, the message is still sent, only without notifications.
+/// Households does not answer, the message is still sent, only without notifications. The link opens the chat page
+/// on that conversation (the page reads <c>?c=</c>; plugin pages have no path parameters).
 /// </summary>
 internal sealed partial class MessageNotifier(
     IHouseholdMembers members, IMuteRepository mutes, IPresence presence, INotifier notifier, TimeProvider time, ILogger<MessageNotifier> logger)
@@ -65,7 +66,7 @@ internal sealed partial class MessageNotifier(
                 ChatPlugin.MessageNotification,
                 title,
                 direct ? content : $"{author}: {content}",
-                $"/homes/{conversation.HouseholdId}/apps/chat/c/{conversation.Id}",
+                $"/homes/{conversation.HouseholdId}/apps/chat?c={conversation.Id}",
                 conversation.HouseholdId,
                 $"chat-{conversation.Id:N}",
                 direct ? $"Nowa wiadomość od {author}" : $"Nowa wiadomość w {title}"),
