@@ -11,7 +11,7 @@ var T = { class: "chat-widget" }, E = {
 	class: "chat-widget__empty"
 }, j = p({
 	id: "chat",
-	routes: { "": () => import("./ChatPage-DEWbcA-L.js") },
+	routes: { "": () => import("./ChatPage-D-50m8QS.js") },
 	widgets: { chat: /* @__PURE__ */ b(/* @__PURE__ */ a({
 		__name: "ChatWidget",
 		props: {
@@ -35,7 +35,7 @@ var T = { class: "chat-widget" }, E = {
 			o(() => {
 				H.forEach((e) => e()), B.stop();
 			});
-			let U = d(() => `/homes/${p.householdId}/apps/chat`);
+			let U = (e) => e.length === 1 ? b.t(e[0].kind === "Video" ? "media.video" : "media.photo") : b.t("media.count", { count: e.length }), W = d(() => `/homes/${p.householdId}/apps/chat`);
 			return (a, o) => {
 				let d = s("Skeleton"), f = s("Badge"), p = s("RouterLink");
 				return r(), t("div", T, [l(M).isPending.value || l(R).isPending.value ? (r(), t("div", E, [(r(), t(S, null, i(3, (e) => n(d, {
@@ -43,10 +43,10 @@ var T = { class: "chat-widget" }, E = {
 					height: "1.5rem"
 				})), 64))])) : (r(), t(S, { key: 1 }, [z.value.length ? (r(), t("ul", D, [(r(!0), t(S, null, i(z.value, (n) => (r(), t("li", { key: n.id }, [
 					C("strong", null, e(l(N)(n.authorId)), 1),
-					C("span", O, e(l(y)(n.text, 120) || l(b).t("media.count", { count: n.attachments.length })), 1),
+					C("span", O, e(l(y)(n.text, 120) || U(n.attachments)), 1),
 					C("time", { datetime: n.sentAt }, e(l(P).when(n.sentAt)), 9, k)
 				]))), 128))])) : (r(), t("p", A, e(l(b).t("widget.empty")), 1)), n(p, {
-					to: U.value,
+					to: W.value,
 					class: "chat-widget__open"
 				}, {
 					default: u(() => [
@@ -65,7 +65,7 @@ var T = { class: "chat-widget" }, E = {
 				}, 8, ["to"])], 64))]);
 			};
 		}
-	}), [["__scopeId", "data-v-488d1a63"]]) },
+	}), [["__scopeId", "data-v-c30d6934"]]) },
 	messages: {
 		pl: {
 			home: "Dom",
@@ -137,6 +137,7 @@ var T = { class: "chat-widget" }, E = {
 				count: "Zdjęcia i filmy: {count}",
 				gallery: "Zdjęcia i filmy",
 				photo: "Zdjęcie",
+				video: "Film",
 				original: "Oryginał",
 				previous: "Poprzednie",
 				next: "Następne",
@@ -155,6 +156,7 @@ var T = { class: "chat-widget" }, E = {
 				tooLarge: "Plik jest za duży (najwyżej 20 MB).",
 				tooLong: "Film jest za długi (najwyżej 30 sekund).",
 				failed: "Nie udało się dodać pliku.",
+				storageFull: "W tym domu zabrakło miejsca na zdjęcia i filmy. Usuń stare albo poproś administratora o więcej.",
 				tooMany: "Do jednej wiadomości można dodać najwyżej {count} plików.",
 				processing: "Sprawdzanie…",
 				remove: "Usuń plik {name}"
@@ -259,6 +261,7 @@ var T = { class: "chat-widget" }, E = {
 				count: "Photos and videos: {count}",
 				gallery: "Photos and videos",
 				photo: "Photo",
+				video: "Video",
 				original: "Original",
 				previous: "Previous",
 				next: "Next",
@@ -277,6 +280,7 @@ var T = { class: "chat-widget" }, E = {
 				tooLarge: "The file is too large (20 MB at most).",
 				tooLong: "The video is too long (30 seconds at most).",
 				failed: "Could not add the file.",
+				storageFull: "This household has no room left for photos and videos. Delete old ones or ask the admin for more.",
 				tooMany: "A message takes {count} files at most.",
 				processing: "Checking…",
 				remove: "Remove file {name}"

@@ -324,3 +324,11 @@ Bez pytania przyjmuję: emoji z klawiatury systemu, brak wyszukiwania i przypina
   `?c=` (stąd zmiana linku powiadomienia); komunikaty w rozmowie o zmianach w pokoju są lokalne (widzi je ten, kto ma
   pokój otwarty), bo serwer nie zapisuje wiadomości systemowych; reakcje i menu wiadomości są pod „…” (na telefonie
   zawsze widoczne); film za długi albo za duży odpada przed wysłaniem, gdy przeglądarka umie odczytać jego długość.
+- 2026-11-11: C4 `chat/docker`: `Dockerfile` (ffmpeg z apt, `/data/media` należy do `$APP_UID` 1654), `compose.yaml`
+  (sieć `homeapps_default`, wolumin `homeapps_chat_media`, `CHAT_MEDIA_SIGNING_KEY` i opcjonalnie
+  `CHAT_STORAGE_BYTES_PER_HOUSEHOLD` z `.env` HomeApps). W HomeApps gałąź `docs/plugin-chat`: `docs/plugin-chat.md`,
+  szyfrowana kopia zapasowa bazy i woluminu (openssl AES-256 z hasłem w pliku) w `docs/deployment.md`, poprawka
+  `scripts/smoke.sh` (status po `call | jq`). Sprawdzone na `compose.prod.yaml` + `compose.smoke.yaml`: smoke przeszedł,
+  w Chromium przez Traefika włączenie w ustawieniach domu, „… pisze”, tekst, zdjęcie i film na żywo przez WebSocket,
+  odtwarzanie filmu, odrzucenie filmu 40 s, widżet, telefon; kopia i odtworzenie woluminu. Poprawki UI przy okazji:
+  przetłumaczony `chat.storage_full`, widżet pisze „Zdjęcie”/„Film” zamiast licznika. Obraz ma ok. 400 MB (ffmpeg).

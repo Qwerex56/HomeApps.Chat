@@ -11,7 +11,8 @@ z lokalnego feedu) oraz kontraktu pluginów (`docs/plugins.md` w HomeApps). Plan
 | C1 `chat/domain` | `Conversation` (dom, pokoje, 1:1), `Message`, `Attachment`, `ReadMarker` + testy | gotowe |
 | C2 `chat/api` | Application, Infrastructure, Api (port 5410), hub SignalR, media | gotowe |
 | C3 `chat/web` | UI pluginu (`src/Chat.Web`) i widżet | gotowe |
-| C4 `chat/docker` | obraz z `ffmpeg`, `compose.yaml`, wolumin `chat_media` | dalej |
+| C4 `chat/docker` | obraz z `ffmpeg`, `compose.yaml`, wolumin `chat_media` | gotowe |
+| C5 `chat/mcp` | narzędzia MCP dla JARVIS-a | po 1.0 |
 
 ## Wymagania
 
@@ -40,6 +41,17 @@ npm run build   # vue-tsc + vite → ../Chat.Api/wwwroot/ui
 ```
 
 Rozmowę na ekranie trzyma adres (`/homes/{hid}/apps/chat?c={cid}`), tam też prowadzi powiadomienie.
+
+## Uruchomienie obok HomeApps (Docker)
+
+Krok po kroku, z kopiami zapasowymi: `docs/plugin-chat.md` w HomeApps. W skrócie (obok katalogu `HomeApps`):
+
+```bash
+ln -s ../HomeApps/.env .env                       # raz; w tym .env także CHAT_MEDIA_SIGNING_KEY
+docker compose -f compose.yaml up -d --build      # obraz z ffmpeg, baza homeapps_chat, wolumin homeapps_chat_media
+```
+
+oraz `chat` w `HOMEAPPS_PLUGINS` i `docker compose -f compose.prod.yaml up -d web` w HomeApps.
 
 ## Uruchomienie w dev
 

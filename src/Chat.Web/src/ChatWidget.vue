@@ -2,6 +2,7 @@
 import { computed, onUnmounted } from 'vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { WidgetProps } from '@homeapps/plugin-sdk'
+import type { MessageView } from './api'
 import { useFormat } from './format'
 import { createHub } from './hub'
 import { plainText } from './markdown'
@@ -43,6 +44,10 @@ onUnmounted(() => {
   hub.stop()
 })
 
+// One file by its kind, several as a count.
+const describeMedia = (files: MessageView['attachments']) =>
+  files.length === 1 ? host.t(files[0]!.kind === 'Video' ? 'media.video' : 'media.photo') : host.t('media.count', { count: files.length })
+
 const chatPage = computed(() => `/homes/${props.householdId}/apps/chat`)
 </script>
 
@@ -56,7 +61,7 @@ const chatPage = computed(() => `/homes/${props.householdId}/apps/chat`)
         <li v-for="message in shown" :key="message.id">
           <strong>{{ nameOf(message.authorId) }}</strong>
           <span class="chat-widget__text">
-            {{ plainText(message.text, 120) || host.t('media.count', { count: message.attachments.length }) }}
+            {{ plainText(message.text, 120) || describeMedia(message.attachments) }}
           </span>
           <time :datetime="message.sentAt">{{ format.when(message.sentAt) }}</time>
         </li>

@@ -1,0 +1,51 @@
+# The chat plugin next to a running HomeApps (docs/plugin-chat.md in HomeApps). It joins HomeApps' Docker network,
+# uses its Postgres (own database homeapps_chat, created on first start), RabbitMQ and Auth, and claims /plugins/chat
+# (API, hub and media) in its Traefik. Settings come from HomeApps' .env:
+#   ln -s ../HomeApps/.env .env      (once; .env is ignored by git)
+#   CHAT_MEDIA_SIGNING_KEY=...       (in that .env: openssl rand -base64 48)
+#   docker compose -f compose.yaml up -d --build   (-f: the linked .env may set COMPOSE_FILE for HomeApps)
+# and HOMEAPPS_PLUGINS=chat in that .env (then recreate HomeApps' web container) makes the web app load it.
+name: homeapps-chat
+
+services:
+  chat:
+    image: homeapps/chat:1.0.0
+    build:
+      context: .
+      additional_contexts:
+        homeapps: ${HOMEAPPS_PACKAGES:-${HOME}/.homeapps/packages}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__MigrateOnStartup: "true"
+      Logging__LogLevel__Microsoft.EntityFrameworkCore: Warning
+      ConnectionStrings__Database: "Host=postgres;Database=homeapps_chat;Username=${POSTGRES_USER:-homeapps};Password=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD (HomeApps .env)}"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USER:-homeapps}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD (HomeApps .env)}
+      Jwt__Authority: "http://auth:8080"
+      Jwt__Issuer: "https://${HOMEAPPS_DOMAIN:?set HOMEAPPS_DOMAIN (HomeApps .env)}"
+      Jwt__RequireHttpsMetadata: "false"
+      Plugin__HouseholdsUrl: "http://households:8080"
+      Chat__Media__Root: /data/media
+      # Signs the links to photos and films; changing it only makes links older than two hours invalid.
+      Chat__Media__SigningKey: ${CHAT_MEDIA_SIGNING_KEY:?set CHAT_MEDIA_SIGNING_KEY in HomeApps .env (openssl rand -base64 48)}
+      # C11: what one household may keep, 10 GB unless set.
+      Chat__StorageBytesPerHousehold: ${CHAT_STORAGE_BYTES_PER_HOUSEHOLD:-10737418240}
+    volumes:
+      - chat_media:/data/media
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chat.rule=Host(`${HOMEAPPS_DOMAIN}`) && PathPrefix(`/plugins/chat`)"
+      - "traefik.http.routers.chat.entrypoints=websecure"
+      - "traefik.http.services.chat.loadbalancer.server.port=8080"
+
+volumes:
+  # Photos and films (C10). Back it up together with Postgres (docs/deployment.md in HomeApps, "Backups").
+  chat_media:
+    name: homeapps_chat_media
+
+networks:
+  default:
+    name: homeapps_default
+    external: true

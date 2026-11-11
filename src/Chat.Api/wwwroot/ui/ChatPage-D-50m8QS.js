@@ -402,7 +402,7 @@ var Ae = { class: "chat-composer" }, je = {
 				if (e.abort.signal.aborted) return;
 				e.state = "failed";
 				let n = x(t);
-				e.problem = ke(n) ? R(ke(n)) : g.errorMessage(t);
+				e.problem = n === "chat.storage_full" ? g.t("upload.storageFull") : ke(n) ? R(ke(n)) : g.errorMessage(t);
 			}
 		}
 		function V(e, t) {
@@ -607,7 +607,7 @@ var Ae = { class: "chat-composer" }, je = {
 			]);
 		};
 	}
-}), [["__scopeId", "data-v-9369fa74"]]), Ue = { class: "chat-message__avatar" }, We = { class: "chat-message__body" }, Ge = {
+}), [["__scopeId", "data-v-5389f186"]]), Ue = { class: "chat-message__avatar" }, We = { class: "chat-message__body" }, Ge = {
 	key: 0,
 	class: "chat-message__author"
 }, Ke = { class: "chat-message__row" }, qe = {

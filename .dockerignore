@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+**/node_modules/
+tests/
+.git/
+.idea/
+src/Chat.Api/media/

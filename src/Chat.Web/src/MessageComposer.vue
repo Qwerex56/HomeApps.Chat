@@ -109,7 +109,8 @@ async function run(upload: Upload, file: File) {
     if (upload.abort.signal.aborted) return
     upload.state = 'failed'
     const code = errorCode(error)
-    upload.problem = problemOf(code) ? problemText(problemOf(code)) : host.errorMessage(error)
+    upload.problem =
+      code === 'chat.storage_full' ? host.t('upload.storageFull') : problemOf(code) ? problemText(problemOf(code)) : host.errorMessage(error)
   }
 }
 
