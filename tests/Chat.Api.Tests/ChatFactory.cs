@@ -62,6 +62,7 @@ public sealed class ChatFactory : HomeAppsApiFactory<Program, ChatDbContext>
     {
         services.AddHttpClient(nameof(IHouseholdAccess)).ConfigurePrimaryHttpMessageHandler(() => Households);
         services.AddHttpClient(nameof(IHouseholdMembers)).ConfigurePrimaryHttpMessageHandler(() => Households);
+        services.AddHttpClient(nameof(IHouseholdDirectory)).ConfigurePrimaryHttpMessageHandler(() => Households);
         services.AddSingleton<TimeProvider>(Time);
 
         var real = services.Last(d => d.ServiceType == typeof(IEventBus));

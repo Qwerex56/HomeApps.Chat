@@ -30,6 +30,7 @@ internal sealed class AHousehold(ChatFactory factory)
     public static async Task<AHousehold> SwitchedOnAsync(ChatFactory factory)
     {
         var h = new AHousehold(factory);
+        factory.Households.HouseholdNames[h.Id] = "Mieszkanie";
         factory.Households.Set(h.Id, h.Owner, HouseholdRole.Owner, name: "Ola");
         factory.Households.Set(h.Id, h.Admin, HouseholdRole.Admin, name: "Adam");
         factory.Households.Set(h.Id, h.Member, HouseholdRole.Member, name: "Ania");
