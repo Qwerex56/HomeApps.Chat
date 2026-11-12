@@ -43,6 +43,7 @@ export default {
     forever: 'Wycisz',
   },
   message: {
+    viaAssistant: 'przez JARVIS-a',
     deleted: 'Wiadomość usunięta',
     edited: 'edytowana',
     actions: 'Działania na wiadomości',

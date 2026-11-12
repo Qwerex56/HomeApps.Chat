@@ -616,17 +616,17 @@ var Ae = { class: "chat-composer" }, je = {
 }, Je = { key: 0 }, Ye = ["aria-label", "onClick"], Xe = ["src", "alt"], Ze = {
 	key: 0,
 	class: "chat-message__play"
-}, Qe = ["innerHTML"], $e = { class: "chat-message__meta" }, et = { key: 0 }, tt = {
+}, Qe = ["innerHTML"], $e = { class: "chat-message__meta" }, et = { key: 0 }, tt = { key: 1 }, nt = {
 	key: 1,
 	class: "chat-message__reactions"
-}, nt = [
+}, rt = [
 	"title",
 	"disabled",
 	"onClick"
-], rt = {
+], it = {
 	key: 2,
 	class: "chat-message__seen"
-}, it = /*#__PURE__*/ M(/* @__PURE__ */ f({
+}, at = /*#__PURE__*/ M(/* @__PURE__ */ f({
 	__name: "MessageItem",
 	props: {
 		message: {},
@@ -690,7 +690,11 @@ var Ae = { class: "chat-composer" }, je = {
 						class: "chat-message__text",
 						innerHTML: d.value
 					}, null, 8, Qe)) : h("", !0)
-				], 64)), F("div", $e, [e.message.editedAt && !e.message.deleted ? (a(), n("span", et, t(v(c).t("message.edited")) + " · ", 1)) : h("", !0), i(t(e.time), 1)])], 2), e.canAct && !e.message.deleted ? (a(), I(x, {
+				], 64)), F("div", $e, [
+					e.message.sentVia === "Mcp" && !e.message.deleted ? (a(), n("span", et, t(v(c).t("message.viaAssistant")) + " · ", 1)) : h("", !0),
+					e.message.editedAt && !e.message.deleted ? (a(), n("span", tt, t(v(c).t("message.edited")) + " · ", 1)) : h("", !0),
+					i(t(e.time), 1)
+				])], 2), e.canAct && !e.message.deleted ? (a(), I(x, {
 					key: 0,
 					class: "chat-message__more",
 					icon: "pi pi-ellipsis-h",
@@ -701,22 +705,22 @@ var Ae = { class: "chat-composer" }, je = {
 					"aria-label": v(c).t("message.actions"),
 					onClick: o[1] ||= (e) => s("menu", e)
 				}, null, 8, ["aria-label"])) : h("", !0)]),
-				e.message.reactions.length && !e.message.deleted ? (a(), n("div", tt, [(a(!0), n(P, null, l(e.message.reactions, (r) => (a(), n("button", {
+				e.message.reactions.length && !e.message.deleted ? (a(), n("div", nt, [(a(!0), n(P, null, l(e.message.reactions, (r) => (a(), n("button", {
 					key: r.emoji,
 					type: "button",
 					class: D({ active: !!e.userId && r.userIds.includes(e.userId) }),
 					title: y(r.userIds),
 					disabled: !e.canReact,
 					onClick: (t) => s("react", r.emoji, !!e.userId && r.userIds.includes(e.userId))
-				}, [i(t(r.emoji) + " ", 1), F("span", null, t(r.userIds.length), 1)], 10, nt))), 128))])) : h("", !0),
-				e.seen ? (a(), n("div", rt, [o[3] ||= F("i", {
+				}, [i(t(r.emoji) + " ", 1), F("span", null, t(r.userIds.length), 1)], 10, rt))), 128))])) : h("", !0),
+				e.seen ? (a(), n("div", it, [o[3] ||= F("i", {
 					class: "pi pi-check",
 					"aria-hidden": "true"
 				}, null, -1), i(" " + t(v(c).t("message.seen")), 1)])) : h("", !0)
 			])], 2);
 		};
 	}
-}), [["__scopeId", "data-v-518b9a6a"]]), at = { class: "chat-picker" }, ot = /*#__PURE__*/ M(/* @__PURE__ */ f({
+}), [["__scopeId", "data-v-b3fb0dea"]]), ot = { class: "chat-picker" }, st = /*#__PURE__*/ M(/* @__PURE__ */ f({
 	__name: "MemberPicker",
 	props: /*@__PURE__*/ O({ members: {} }, {
 		modelValue: { required: !0 },
@@ -730,7 +734,7 @@ var Ae = { class: "chat-composer" }, je = {
 		}
 		return (s, c) => {
 			let u = m("Checkbox"), d = m("Avatar");
-			return a(), n("ul", at, [(a(!0), n(P, null, l(e.members, (e) => (a(), n("li", { key: e.userId }, [F("label", null, [
+			return a(), n("ul", ot, [(a(!0), n(P, null, l(e.members, (e) => (a(), n("li", { key: e.userId }, [F("label", null, [
 				r(u, {
 					"model-value": i.value.includes(e.userId),
 					binary: "",
@@ -745,13 +749,13 @@ var Ae = { class: "chat-composer" }, je = {
 			])]))), 128))]);
 		};
 	}
-}), [["__scopeId", "data-v-a6c6a27e"]]), st = {
+}), [["__scopeId", "data-v-a6c6a27e"]]), ct = {
 	key: 0,
 	class: "chat-room-dialog__field"
-}, ct = { class: "chat-room-dialog__field" }, lt = {
+}, lt = { class: "chat-room-dialog__field" }, ut = {
 	key: 1,
 	class: "chat-room-dialog__empty"
-}, ut = { class: "chat-room-dialog__actions" }, dt = 60, ft = /*#__PURE__*/ M(/* @__PURE__ */ f({
+}, dt = { class: "chat-room-dialog__actions" }, ft = 60, pt = /*#__PURE__*/ M(/* @__PURE__ */ f({
 	__name: "RoomDialog",
 	props: {
 		mode: {},
@@ -780,19 +784,19 @@ var Ae = { class: "chat-composer" }, je = {
 					class: "chat-room-dialog",
 					onSubmit: o(g, ["prevent"])
 				}, [
-					e.mode === "create" ? (a(), n("label", st, [F("span", null, t(v(u).t("room.name")), 1), r(c, {
+					e.mode === "create" ? (a(), n("label", ct, [F("span", null, t(v(u).t("room.name")), 1), r(c, {
 						modelValue: d.value,
 						"onUpdate:modelValue": s[0] ||= (e) => d.value = e,
-						maxlength: dt,
+						maxlength: ft,
 						autofocus: ""
 					}, null, 8, ["modelValue"])])) : h("", !0),
-					F("div", ct, [F("span", null, t(v(u).t("room.people")), 1), e.members.length ? (a(), I(ot, {
+					F("div", lt, [F("span", null, t(v(u).t("room.people")), 1), e.members.length ? (a(), I(st, {
 						key: 0,
 						modelValue: f.value,
 						"onUpdate:modelValue": s[1] ||= (e) => f.value = e,
 						members: e.members
-					}, null, 8, ["modelValue", "members"])) : (a(), n("p", lt, t(v(u).t("room.nobodyToAdd")), 1))]),
-					F("div", ut, [r(_, {
+					}, null, 8, ["modelValue", "members"])) : (a(), n("p", ut, t(v(u).t("room.nobodyToAdd")), 1))]),
+					F("div", dt, [r(_, {
 						type: "button",
 						label: v(u).t("cancel"),
 						severity: "secondary",
@@ -813,10 +817,10 @@ var Ae = { class: "chat-composer" }, je = {
 			}, 8, ["header"]);
 		};
 	}
-}), [["__scopeId", "data-v-cd6c8d45"]]), pt = { class: "chat-room" }, mt = { class: "chat-room__people" }, ht = { class: "chat-room__person" }, gt = {
+}), [["__scopeId", "data-v-cd6c8d45"]]), mt = { class: "chat-room" }, ht = { class: "chat-room__people" }, gt = { class: "chat-room__person" }, _t = {
 	key: 2,
 	class: "chat-room__danger"
-}, _t = { key: 0 }, vt = { key: 1 }, yt = { class: "chat-room__buttons" }, bt = { class: "chat-room__buttons" }, xt = /*#__PURE__*/ M(/* @__PURE__ */ f({
+}, vt = { key: 0 }, yt = { key: 1 }, bt = { class: "chat-room__buttons" }, xt = { class: "chat-room__buttons" }, St = /*#__PURE__*/ M(/* @__PURE__ */ f({
 	__name: "RoomPanel",
 	props: {
 		conversation: {},
@@ -850,7 +854,7 @@ var Ae = { class: "chat-composer" }, je = {
 				class: "chat-room-drawer",
 				"onUpdate:visible": c[9] ||= (e) => d("close")
 			}, {
-				default: y(() => [F("div", pt, [
+				default: y(() => [F("div", mt, [
 					e.conversation.archived ? (a(), I(u, {
 						key: 0,
 						severity: "secondary",
@@ -879,13 +883,13 @@ var Ae = { class: "chat-composer" }, je = {
 					])], 32)) : h("", !0),
 					F("section", null, [
 						F("h3", null, t(v(f).t("room.participants", { count: e.conversation.participantIds.length })), 1),
-						F("ul", mt, [(a(!0), n(P, null, l(e.conversation.participantIds, (o) => (a(), n("li", { key: o }, [
+						F("ul", ht, [(a(!0), n(P, null, l(e.conversation.participantIds, (o) => (a(), n("li", { key: o }, [
 							r(k, {
 								image: v(b)(o) ?? void 0,
 								label: v(b)(o) ? void 0 : v(x)(o),
 								shape: "circle"
 							}, null, 8, ["image", "label"]),
-							F("span", ht, [i(t(v(g)(o)), 1), o === v(p) ? (a(), n(P, { key: 0 }, [i(" (" + t(v(f).t("you")) + ")", 1)], 64)) : h("", !0)]),
+							F("span", gt, [i(t(v(g)(o)), 1), o === v(p) ? (a(), n(P, { key: 0 }, [i(" (" + t(v(f).t("you")) + ")", 1)], 64)) : h("", !0)]),
 							o === e.conversation.keeperId ? (a(), I(K, {
 								key: 0,
 								value: v(f).t("room.keeper"),
@@ -916,7 +920,7 @@ var Ae = { class: "chat-composer" }, je = {
 							onClick: c[1] ||= (e) => N.value = !0
 						}, null, 8, ["label"])) : h("", !0)
 					]),
-					e.conversation.participantIds.includes(v(p) ?? "") ? (a(), n("section", gt, [z.value ? (a(), n(P, { key: 0 }, [V.value ? (a(), n("label", _t, [F("span", null, t(v(f).t("room.successor")), 1), r(ee, {
+					e.conversation.participantIds.includes(v(p) ?? "") ? (a(), n("section", _t, [z.value ? (a(), n(P, { key: 0 }, [V.value ? (a(), n("label", vt, [F("span", null, t(v(f).t("room.successor")), 1), r(ee, {
 						modelValue: B.value,
 						"onUpdate:modelValue": c[2] ||= (e) => B.value = e,
 						options: H.value,
@@ -927,7 +931,7 @@ var Ae = { class: "chat-composer" }, je = {
 						"modelValue",
 						"options",
 						"placeholder"
-					])])) : (a(), n("p", vt, t(v(f).t(E.value.length ? "room.leaveConfirm" : "room.leaveLastConfirm")), 1)), F("div", yt, [r(S, {
+					])])) : (a(), n("p", yt, t(v(f).t(E.value.length ? "room.leaveConfirm" : "room.leaveLastConfirm")), 1)), F("div", bt, [r(S, {
 						label: v(f).t("cancel"),
 						severity: "secondary",
 						text: "",
@@ -942,7 +946,7 @@ var Ae = { class: "chat-composer" }, je = {
 						"label",
 						"disabled",
 						"loading"
-					])])], 64)) : W.value ? (a(), n(P, { key: 1 }, [F("p", null, t(v(f).t("room.archiveConfirm")), 1), F("div", bt, [r(S, {
+					])])], 64)) : W.value ? (a(), n(P, { key: 1 }, [F("p", null, t(v(f).t("room.archiveConfirm")), 1), F("div", xt, [r(S, {
 						label: v(f).t("cancel"),
 						severity: "secondary",
 						text: "",
@@ -968,7 +972,7 @@ var Ae = { class: "chat-composer" }, je = {
 						size: "small",
 						onClick: c[6] ||= (e) => W.value = !0
 					}, null, 8, ["label"])) : h("", !0)], 64))])) : h("", !0)
-				]), N.value ? (a(), I(ft, {
+				]), N.value ? (a(), I(pt, {
 					key: 0,
 					mode: "add",
 					members: D.value,
@@ -980,41 +984,41 @@ var Ae = { class: "chat-composer" }, je = {
 			}, 8, ["header"]);
 		};
 	}
-}), [["__scopeId", "data-v-02583563"]]), St = ["aria-label"], Ct = { class: "chat-pane__header" }, wt = { class: "chat-pane__title" }, Tt = { key: 0 }, Et = {
+}), [["__scopeId", "data-v-02583563"]]), Ct = ["aria-label"], wt = { class: "chat-pane__header" }, Tt = { class: "chat-pane__title" }, Et = { key: 0 }, Dt = {
 	key: 0,
 	class: "chat-pane__loading"
-}, Dt = {
+}, Ot = {
 	key: 0,
 	class: "chat-pane__older"
-}, Ot = {
-	key: 1,
-	class: "chat-pane__note"
 }, kt = {
-	key: 2,
+	key: 1,
 	class: "chat-pane__note"
 }, At = {
-	key: 3,
+	key: 2,
 	class: "chat-pane__note"
 }, jt = {
+	key: 3,
+	class: "chat-pane__note"
+}, Mt = {
 	key: 0,
 	class: "chat-pane__day"
-}, Mt = {
+}, Nt = {
 	key: 1,
 	class: "chat-pane__new"
-}, Nt = {
+}, Pt = {
 	key: 2,
 	class: "chat-pane__notice"
-}, Pt = { class: "chat-outgoing__bubble" }, Ft = {
+}, Ft = { class: "chat-outgoing__bubble" }, It = {
 	key: 0,
 	class: "chat-outgoing__media"
-}, It = ["src"], Lt = ["innerHTML"], Rt = { class: "chat-outgoing__state" }, zt = {
+}, Lt = ["src"], Rt = ["innerHTML"], zt = { class: "chat-outgoing__state" }, Bt = {
 	key: 4,
 	class: "chat-pane__typing",
 	"aria-live": "polite"
-}, Bt = {
+}, Vt = {
 	key: 2,
 	class: "chat-pane__readonly"
-}, Vt = { class: "chat-reactions" }, Ht = ["aria-label", "onClick"], Ut = { class: "chat-pane__confirm" }, Wt = 288e5, Gt = 80, Kt = /*#__PURE__*/ M(/* @__PURE__ */ f({
+}, Ht = { class: "chat-reactions" }, Ut = ["aria-label", "onClick"], Wt = { class: "chat-pane__confirm" }, Gt = 288e5, Kt = 80, qt = /*#__PURE__*/ M(/* @__PURE__ */ f({
 	__name: "ConversationPane",
 	props: {
 		chat: {},
@@ -1054,7 +1058,7 @@ var Ae = { class: "chat-composer" }, je = {
 		}
 		function oe() {
 			let e = q.value;
-			e && (J.value = e.scrollHeight - e.scrollTop - e.clientHeight < Gt, J.value && (Y.value = 0, ie()), e.scrollTop < 160 && ae());
+			e && (J.value = e.scrollHeight - e.scrollTop - e.clientHeight < Kt, J.value && (Y.value = 0, ie()), e.scrollTop < 160 && ae());
 		}
 		_(U.loading, async (t) => {
 			if (t) return;
@@ -1153,7 +1157,7 @@ var Ae = { class: "chat-composer" }, je = {
 		}] : [{
 			label: b.t("mute.eightHours"),
 			icon: "pi pi-clock",
-			command: () => Se(new Date(Date.now() + Wt).toISOString())
+			command: () => Se(new Date(Date.now() + Gt).toISOString())
 		}, {
 			label: b.t("mute.forever"),
 			icon: "pi pi-bell-slash",
@@ -1168,7 +1172,7 @@ var Ae = { class: "chat-composer" }, je = {
 				class: "chat-pane",
 				"aria-label": v(N)(o.conversation)
 			}, [
-				F("header", Ct, [
+				F("header", wt, [
 					o.phone ? (a(), I(c, {
 						key: 0,
 						icon: "pi pi-arrow-left",
@@ -1188,7 +1192,7 @@ var Ae = { class: "chat-composer" }, je = {
 						icon: W.value ? "pi pi-home" : "pi pi-hashtag",
 						shape: "circle"
 					}, null, 8, ["icon"])),
-					F("div", wt, [F("h2", null, t(v(N)(o.conversation)), 1), Ee.value ? (a(), n("p", Tt, t(Ee.value), 1)) : h("", !0)]),
+					F("div", Tt, [F("h2", null, t(v(N)(o.conversation)), 1), Ee.value ? (a(), n("p", Et, t(Ee.value), 1)) : h("", !0)]),
 					r(c, {
 						icon: o.conversation.muted ? "pi pi-bell-slash" : "pi pi-bell",
 						text: "",
@@ -1218,25 +1222,25 @@ var Ae = { class: "chat-composer" }, je = {
 					ref: q,
 					class: "chat-pane__history",
 					onScrollPassive: oe
-				}, [v(U).loading.value ? (a(), n("div", Et, [(a(), n(P, null, l(4, (e) => r(p, {
+				}, [v(U).loading.value ? (a(), n("div", Dt, [(a(), n(P, null, l(4, (e) => r(p, {
 					key: e,
 					height: "2.5rem",
 					width: e % 2 ? "60%" : "40%"
 				}, null, 8, ["width"])), 64))])) : (a(), n(P, { key: 1 }, [
-					v(U).loadingOlder.value ? (a(), n("div", Dt, [r(_, {
+					v(U).loadingOlder.value ? (a(), n("div", Ot, [r(_, {
 						style: {
 							width: "1.5rem",
 							height: "1.5rem"
 						},
 						"stroke-width": "6"
-					})])) : !v(U).hasOlder.value && o.conversation.readsFrom ? (a(), n("p", Ot, t(v(b).t("guest.readsFrom")), 1)) : h("", !0),
-					v(U).failed.value ? (a(), n("p", kt, [i(t(v(b).t("loadFailed")) + " ", 1), r(c, {
+					})])) : !v(U).hasOlder.value && o.conversation.readsFrom ? (a(), n("p", kt, t(v(b).t("guest.readsFrom")), 1)) : h("", !0),
+					v(U).failed.value ? (a(), n("p", At, [i(t(v(b).t("loadFailed")) + " ", 1), r(c, {
 						label: v(b).t("retry"),
 						text: "",
 						size: "small",
 						onClick: s[3] ||= (e) => v(U).load()
-					}, null, 8, ["label"])])) : te.value.length ? h("", !0) : (a(), n("p", At, t(v(b).t(K.value ? "empty.writable" : "empty.readOnly")), 1)),
-					(a(!0), n(P, null, l(te.value, (e) => (a(), n(P, { key: e.key }, [e.kind === "day" ? (a(), n("div", jt, [F("span", null, t(v(z).day(e.date)), 1)])) : e.kind === "new" ? (a(), n("div", Mt, [F("span", null, t(v(b).t("newMessages")), 1)])) : e.kind === "notice" ? (a(), n("div", Nt, t(e.text), 1)) : e.kind === "message" ? (a(), I(it, {
+					}, null, 8, ["label"])])) : te.value.length ? h("", !0) : (a(), n("p", jt, t(v(b).t(K.value ? "empty.writable" : "empty.readOnly")), 1)),
+					(a(!0), n(P, null, l(te.value, (e) => (a(), n(P, { key: e.key }, [e.kind === "day" ? (a(), n("div", Mt, [F("span", null, t(v(z).day(e.date)), 1)])) : e.kind === "new" ? (a(), n("div", Nt, [F("span", null, t(v(b).t("newMessages")), 1)])) : e.kind === "notice" ? (a(), n("div", Pt, t(e.text), 1)) : e.kind === "message" ? (a(), I(at, {
 						key: 3,
 						message: e.message,
 						mine: e.mine,
@@ -1277,14 +1281,14 @@ var Ae = { class: "chat-composer" }, je = {
 							"chat-outgoing--failed": e.message.failed,
 							"chat-outgoing--lead": e.lead
 						}])
-					}, [F("div", Pt, [e.message.attachments.length ? (a(), n("div", Ft, [(a(!0), n(P, null, l(e.message.attachments, (e) => (a(), n("img", {
+					}, [F("div", Ft, [e.message.attachments.length ? (a(), n("div", It, [(a(!0), n(P, null, l(e.message.attachments, (e) => (a(), n("img", {
 						key: e.id,
 						src: e.thumbUrl ?? void 0,
 						alt: ""
-					}, null, 8, It))), 128))])) : h("", !0), e.message.text ? (a(), n("div", {
+					}, null, 8, Lt))), 128))])) : h("", !0), e.message.text ? (a(), n("div", {
 						key: 1,
 						innerHTML: v(C)(e.message.text)
-					}, null, 8, Lt)) : h("", !0)]), F("div", Rt, [e.message.failed ? (a(), n(P, { key: 0 }, [
+					}, null, 8, Rt)) : h("", !0)]), F("div", zt, [e.message.failed ? (a(), n(P, { key: 0 }, [
 						s[14] ||= F("i", {
 							class: "pi pi-exclamation-circle",
 							"aria-hidden": "true"
@@ -1304,7 +1308,7 @@ var Ae = { class: "chat-composer" }, je = {
 							onClick: (t) => v(U).discard(e.message)
 						}, null, 8, ["label", "onClick"])
 					], 64)) : (a(), n(P, { key: 1 }, [i(t(v(b).t("send.sending")), 1)], 64))])], 2))], 64))), 128)),
-					De.value ? (a(), n("p", zt, t(De.value), 1)) : h("", !0)
+					De.value ? (a(), n("p", Bt, t(De.value), 1)) : h("", !0)
 				], 64))], 544),
 				Y.value ? (a(), I(c, {
 					key: 0,
@@ -1333,7 +1337,7 @@ var Ae = { class: "chat-composer" }, je = {
 					"reply-to",
 					"editing",
 					"name-of"
-				])) : (a(), n("p", Bt, t(v(b).t(o.conversation.archived ? "room.archivedNote" : "guest.readOnly")), 1)),
+				])) : (a(), n("p", Vt, t(v(b).t(o.conversation.archived ? "room.archivedNote" : "guest.readOnly")), 1)),
 				r(d, {
 					ref_key: "menu",
 					ref: pe,
@@ -1341,12 +1345,12 @@ var Ae = { class: "chat-composer" }, je = {
 					popup: ""
 				}, g({ _: 2 }, [K.value ? {
 					name: "start",
-					fn: y(() => [F("div", Vt, [(a(), n(P, null, l(B, (e) => F("button", {
+					fn: y(() => [F("div", Ht, [(a(), n(P, null, l(B, (e) => F("button", {
 						key: e,
 						type: "button",
 						"aria-label": v(b).t("message.react", { emoji: e }),
 						onClick: (t) => be(e)
-					}, t(e), 9, Ht)), 64))])]),
+					}, t(e), 9, Ut)), 64))])]),
 					key: "0"
 				} : void 0]), 1032, ["model"]),
 				r(S, {
@@ -1369,10 +1373,10 @@ var Ae = { class: "chat-composer" }, je = {
 						severity: "danger",
 						onClick: fe
 					}, null, 8, ["label"])]),
-					default: y(() => [F("p", Ut, t(v(b).t("message.deleteConfirm")), 1)]),
+					default: y(() => [F("p", Wt, t(v(b).t("message.deleteConfirm")), 1)]),
 					_: 1
 				}, 8, ["visible", "header"]),
-				Te.value && G.value ? (a(), I(xt, {
+				Te.value && G.value ? (a(), I(St, {
 					key: 3,
 					conversation: o.conversation,
 					chat: o.chat,
@@ -1385,22 +1389,22 @@ var Ae = { class: "chat-composer" }, je = {
 					start: Oe.value.index,
 					onClose: s[13] ||= (e) => Oe.value = null
 				}, null, 8, ["items", "start"])) : h("", !0)
-			], 8, St);
+			], 8, Ct);
 		};
 	}
-}), [["__scopeId", "data-v-53ea214f"]]), qt = {
+}), [["__scopeId", "data-v-53ea214f"]]), Jt = {
 	key: 1,
 	class: "chat-page__loading"
-}, Jt = {
+}, Yt = {
 	key: 1,
 	class: "chat-page__pane"
-}, Yt = {
+}, Xt = {
 	key: 0,
 	class: "chat-page__people"
-}, Xt = ["disabled", "onClick"], Zt = {
+}, Zt = ["disabled", "onClick"], Qt = {
 	key: 1,
 	class: "chat-page__nobody"
-}, Qt = 5e3, $t = /*#__PURE__*/ M(/* @__PURE__ */ f({
+}, $t = 5e3, en = /*#__PURE__*/ M(/* @__PURE__ */ f({
 	__name: "ChatPage",
 	setup(e) {
 		let o = b(), s = E(() => o.household.value.id), { conversations: f, members: g, userId: x, nameOf: C, avatarOf: w, initialOf: O } = s, k = T(), A = Z(), j = Q(), M = N(o.manifest.endpoints.realtime ?? "/plugins/chat/hub", o.accessToken, o.household.value.id);
@@ -1429,7 +1433,7 @@ var Ae = { class: "chat-composer" }, je = {
 			M.on("Typing", (e) => {
 				if (e.userId === x.value) return;
 				ee(e.conversationId, e.userId);
-				let t = Date.now() + Qt;
+				let t = Date.now() + $t;
 				K.value.push({
 					conversationId: e.conversationId,
 					userId: e.userId,
@@ -1474,7 +1478,7 @@ var Ae = { class: "chat-composer" }, je = {
 				}, {
 					default: y(() => [i(t(v(o).errorMessage(v(f).error.value)), 1)]),
 					_: 1
-				})) : v(f).isPending.value ? (a(), n("div", qt, [(a(), n(P, null, l(4, (e) => r(p, {
+				})) : v(f).isPending.value ? (a(), n("div", Jt, [(a(), n(P, null, l(4, (e) => r(p, {
 					key: e,
 					height: "2.5rem"
 				})), 64))])) : (a(), n(P, { key: 2 }, [!R.value || !H.value ? (a(), I(ge, {
@@ -1492,7 +1496,7 @@ var Ae = { class: "chat-composer" }, je = {
 					"conversations",
 					"selected-id",
 					"format-when"
-				])) : h("", !0), H.value ? (a(), n("div", Jt, [(a(), I(Kt, {
+				])) : h("", !0), H.value ? (a(), n("div", Yt, [(a(), I(qt, {
 					key: H.value.id,
 					chat: v(s),
 					hub: v(M),
@@ -1508,7 +1512,7 @@ var Ae = { class: "chat-composer" }, je = {
 					"typing",
 					"phone"
 				]))])) : h("", !0)], 64)),
-				J.value === "room" ? (a(), I(ft, {
+				J.value === "room" ? (a(), I(pt, {
 					key: 3,
 					mode: "create",
 					members: q.value,
@@ -1526,7 +1530,7 @@ var Ae = { class: "chat-composer" }, je = {
 					},
 					"onUpdate:visible": c[5] ||= (e) => J.value = null
 				}, {
-					default: y(() => [q.value.length ? (a(), n("ul", Yt, [(a(!0), n(P, null, l(q.value, (e) => (a(), n("li", { key: e.userId }, [F("button", {
+					default: y(() => [q.value.length ? (a(), n("ul", Xt, [(a(!0), n(P, null, l(q.value, (e) => (a(), n("li", { key: e.userId }, [F("button", {
 						type: "button",
 						disabled: Y.value,
 						onClick: (t) => ie(e.userId)
@@ -1534,11 +1538,11 @@ var Ae = { class: "chat-composer" }, je = {
 						image: v(w)(e.userId) ?? void 0,
 						label: v(w)(e.userId) ? void 0 : v(O)(e.userId),
 						shape: "circle"
-					}, null, 8, ["image", "label"]), F("span", null, t(v(C)(e.userId)), 1)], 8, Xt)]))), 128))])) : (a(), n("p", Zt, t(v(o).t("direct.empty")), 1))]),
+					}, null, 8, ["image", "label"]), F("span", null, t(v(C)(e.userId)), 1)], 8, Zt)]))), 128))])) : (a(), n("p", Qt, t(v(o).t("direct.empty")), 1))]),
 					_: 1
 				}, 8, ["visible", "header"])
 			], 6);
 		};
 	}
 }), [["__scopeId", "data-v-f12acabc"]]);
-export { $t as default };
+export { en as default };

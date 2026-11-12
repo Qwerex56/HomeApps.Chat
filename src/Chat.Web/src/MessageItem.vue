@@ -81,7 +81,8 @@ const reactionTitle = (userIds: string[]) => userIds.map((id) => props.nameOf(id
             <div v-if="html" class="chat-message__text" v-html="html" />
           </template>
           <div class="chat-message__meta">
-            <span v-if="message.editedAt && !message.deleted">{{ host.t('message.edited') }} · </span>{{ time }}
+            <span v-if="message.sentVia === 'Mcp' && !message.deleted">{{ host.t('message.viaAssistant') }} · </span
+            ><span v-if="message.editedAt && !message.deleted">{{ host.t('message.edited') }} · </span>{{ time }}
           </div>
         </div>
         <Button

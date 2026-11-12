@@ -42,6 +42,7 @@ export default {
     forever: 'Mute',
   },
   message: {
+    viaAssistant: 'via JARVIS',
     deleted: 'Message deleted',
     edited: 'edited',
     actions: 'Message actions',

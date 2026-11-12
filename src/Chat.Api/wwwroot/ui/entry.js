@@ -11,7 +11,7 @@ var T = { class: "chat-widget" }, E = {
 	class: "chat-widget__empty"
 }, j = p({
 	id: "chat",
-	routes: { "": () => import("./ChatPage-D-50m8QS.js") },
+	routes: { "": () => import("./ChatPage-VGaSiryI.js") },
 	widgets: { chat: /* @__PURE__ */ b(/* @__PURE__ */ a({
 		__name: "ChatWidget",
 		props: {
@@ -122,6 +122,7 @@ var T = { class: "chat-widget" }, E = {
 				forever: "Wycisz"
 			},
 			message: {
+				viaAssistant: "przez JARVIS-a",
 				deleted: "Wiadomość usunięta",
 				edited: "edytowana",
 				actions: "Działania na wiadomości",
@@ -246,6 +247,7 @@ var T = { class: "chat-widget" }, E = {
 				forever: "Mute"
 			},
 			message: {
+				viaAssistant: "via JARVIS",
 				deleted: "Message deleted",
 				edited: "edited",
 				actions: "Message actions",
