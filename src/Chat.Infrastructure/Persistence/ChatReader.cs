@@ -142,6 +142,7 @@ internal sealed class ChatReader(ChatDbContext db, IMediaLinks links, TimeProvid
                 m.Id,
                 m.ConversationId,
                 m.AuthorId,
+                m.AuthorKind,
                 m.ClientMessageId,
                 m.Text?.Value,
                 m.ReplyToId is { } replyId ? Quote(replyId, replies.GetValueOrDefault(replyId), readsFrom) : null,
@@ -154,7 +155,8 @@ internal sealed class ChatReader(ChatDbContext db, IMediaLinks links, TimeProvid
                     .GroupBy(r => r.Emoji)
                     .OrderBy(g => g.Min(r => r.At))
                     .Select(g => new ReactionView(g.Key, g.OrderBy(r => r.At).Select(r => r.UserId).ToList()))
-                    .ToList()))
+                    .ToList(),
+                m.Actions))
             .ToList();
     }
 

@@ -28,5 +28,24 @@ internal sealed class MessageRepository(ChatDbContext db) : IMessageRepository
     public async Task<IReadOnlyList<Message>> ListReactedByAsync(Guid userId, CancellationToken cancellationToken) =>
         await db.Messages.Where(m => m.Reactions.Any(r => r.UserId == userId)).ToListAsync(cancellationToken);
 
+    public Task<Message?> FindAsync(Guid messageId, CancellationToken cancellationToken) =>
+        db.Messages.FirstOrDefaultAsync(m => m.Id == messageId, cancellationToken);
+
+    public async Task<IReadOnlyList<Message>> ListAssistantRepliesAsync(Guid askedId, CancellationToken cancellationToken) =>
+        await db.Messages.Where(m => m.ReplyToId == askedId && m.AuthorKind == AuthorKind.Assistant).ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<Message>> ListBeforeAsync(Guid conversationId, Guid messageId, int count, CancellationToken cancellationToken)
+    {
+        var latest = await db.Messages
+            .Where(m => m.ConversationId == conversationId && m.Id != messageId && m.DeletedAt == null)
+            .OrderByDescending(m => m.SentAt)
+            .ThenByDescending(m => m.Id)
+            .Take(count)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+        latest.Reverse();
+        return latest;
+    }
+
     public void Add(Message message) => db.Messages.Add(message);
 }

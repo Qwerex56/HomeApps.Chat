@@ -22,6 +22,15 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
         builder.Property(m => m.SentVia).HasConversion<string>().HasMaxLength(Converters.EnumLength);
         builder.Property(m => m.Encryption).HasConversion<string>().HasMaxLength(Converters.EnumLength);
         builder.Ignore(m => m.IsDeleted);
+        builder.Property(m => m.AuthorKind).HasConversion<string>().HasMaxLength(Converters.EnumLength);
+
+        // JARVIS's card as JSON on his message: shown whole, never queried.
+        builder.OwnsMany(m => m.Actions, action =>
+        {
+            action.ToJson("Actions");
+            action.Property(a => a.Description).HasMaxLength(1000);
+        });
+        builder.Navigation(m => m.Actions).HasField("_actions").UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.Ignore(m => m.AttachmentIds);
         builder.Property<List<Guid>>("_attachmentIds").HasColumnName("AttachmentIds");

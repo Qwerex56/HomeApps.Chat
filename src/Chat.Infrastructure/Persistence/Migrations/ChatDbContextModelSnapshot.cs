@@ -149,6 +149,11 @@ namespace Chat.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AuthorKind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
                     b.Property<Guid>("ClientMessageId")
                         .HasColumnType("uuid");
 
@@ -168,6 +173,9 @@ namespace Chat.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid>("HouseholdId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("MentionsAssistant")
+                        .HasColumnType("boolean");
 
                     b.Property<long>("Number")
                         .ValueGeneratedOnAdd()
@@ -254,6 +262,25 @@ namespace Chat.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ReadMarkers", (string)null);
+                });
+
+            modelBuilder.Entity("Chat.Domain.Settings.ChatSettings", b =>
+                {
+                    b.Property<Guid>("HouseholdId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AssistantEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ChangedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("HouseholdId");
+
+                    b.ToTable("Settings", (string)null);
                 });
 
             modelBuilder.Entity("HomeApps.Plugins.PluginEnablement", b =>
@@ -487,6 +514,38 @@ namespace Chat.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.OwnsMany("Chat.Domain.Assistant.AssistantAction", "Actions", b1 =>
+                        {
+                            b1.Property<Guid>("MessageId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<DateTimeOffset?>("ConfirmBy");
+
+                            b1.Property<Guid?>("ConfirmationId");
+
+                            b1.Property<string>("Description")
+                                .IsRequired()
+                                .HasMaxLength(1000);
+
+                            b1.Property<string>("Status")
+                                .IsRequired();
+
+                            b1.Property<string>("Url");
+
+                            b1.HasKey("MessageId", "__synthesizedOrdinal");
+
+                            b1.ToTable("Messages");
+
+                            b1
+                                .ToJson("Actions")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MessageId");
+                        });
+
                     b.OwnsMany("Chat.Domain.Messages.Reaction", "Reactions", b1 =>
                         {
                             b1.Property<Guid>("MessageId")
@@ -511,6 +570,8 @@ namespace Chat.Infrastructure.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("MessageId");
                         });
+
+                    b.Navigation("Actions");
 
                     b.Navigation("Reactions");
                 });

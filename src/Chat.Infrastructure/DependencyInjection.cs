@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IAttachmentRepository, AttachmentRepository>();
         services.AddScoped<IReadMarkerRepository, ReadMarkerRepository>();
         services.AddScoped<IMuteRepository, MuteRepository>();
+        services.AddScoped<IChatSettingsRepository, ChatSettingsRepository>();
         services.AddScoped<IChatReader, ChatReader>();
 
         services.AddSingleton<DiskMediaStore>();

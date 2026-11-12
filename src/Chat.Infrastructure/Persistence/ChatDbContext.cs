@@ -1,6 +1,7 @@
 using Chat.Domain.Attachments;
 using Chat.Domain.Conversations;
 using Chat.Domain.Messages;
+using Chat.Domain.Settings;
 using Chat.Domain.Mutes;
 using Chat.Domain.ReadMarkers;
 using HomeApps.Plugins.Hosting;
@@ -21,6 +22,8 @@ public sealed class ChatDbContext(DbContextOptions<ChatDbContext> options, IPubl
     public DbSet<ReadMarker> ReadMarkers => Set<ReadMarker>();
 
     public DbSet<Mute> Mutes => Set<Mute>();
+
+    public DbSet<ChatSettings> Settings => Set<ChatSettings>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
