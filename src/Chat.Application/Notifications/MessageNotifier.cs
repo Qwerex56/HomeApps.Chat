@@ -1,5 +1,5 @@
-using System.Text.RegularExpressions;
 using Chat.Application.Abstractions;
+using Chat.Application.Common;
 using Chat.Domain.Attachments;
 using Chat.Domain.Conversations;
 using Chat.Domain.Messages;
@@ -76,13 +76,8 @@ internal sealed partial class MessageNotifier(
     /// <summary>One line without Markdown marks, cut at <see cref="ExcerptLength"/>.</summary>
     internal static string? Excerpt(string? text)
     {
-        if (text is null)
-        {
-            return null;
-        }
-
-        var plain = Whitespace().Replace(MarkdownMarks().Replace(text, string.Empty), " ").Trim();
-        if (plain.Length == 0)
+        var plain = PlainText.Of(text);
+        if (plain is null)
         {
             return null;
         }
@@ -98,12 +93,6 @@ internal sealed partial class MessageNotifier(
     };
 
     private static string Capitalize(string text) => text.Length == 0 ? text : char.ToUpperInvariant(text[0]) + text[1..];
-
-    [GeneratedRegex(@"[*_~`>#]+")]
-    private static partial Regex MarkdownMarks();
-
-    [GeneratedRegex(@"\s+")]
-    private static partial Regex Whitespace();
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Households did not list the members of {HouseholdId}; the message goes without notifications.")]
     private partial void LogNoMembers(Guid householdId, Exception exception);
