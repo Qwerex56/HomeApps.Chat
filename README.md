@@ -13,6 +13,7 @@ z lokalnego feedu) oraz kontraktu pluginów (`docs/plugins.md` w HomeApps). Plan
 | C3 `chat/web` | UI pluginu (`src/Chat.Web`) i widżet | gotowe |
 | C4 `chat/docker` | obraz z `ffmpeg`, `compose.yaml`, wolumin `chat_media` | gotowe |
 | C5 `chat/mcp` | narzędzia MCP dla JARVIS-a (etap J1 planu JARVIS-a, kit 2.3.0) | gotowe |
+| J3 `chat/assistant` | `@Jarvis` w rozmowach domu i pokojach (etap J3 planu JARVIS-a) | gotowe |
 
 ## Wymagania
 
@@ -69,7 +70,8 @@ nazwa, uczestnicy, `leave` z `successorId`, `archive`), `messages/{id}` (edycja,
 
 Hub `/plugins/chat/hub` (`?access_token=`): `Watch(householdId)`, `Open(conversationId?)`, `Typing(householdId,
 conversationId)`; do klienta idą małe sygnały z samymi id: `MessageSent`, `MessageEdited`, `MessageDeleted`,
-`ReactionChanged`, `ReadMarkerMoved`, `ConversationChanged`, `AttachmentChanged`, `Typing`, `AccessChanged`.
+`ReactionChanged`, `ReadMarkerMoved`, `ConversationChanged`, `AttachmentChanged`, `Typing`, `AccessChanged`,
+`AssistantWorking`.
 
 ## MCP (`/plugins/chat/mcp`, HomeApps 2.3.0+)
 
@@ -87,6 +89,21 @@ czas w lokalnej strefie serwera. Czytanie niczego nie oznacza jako przeczytane.
 Gość czyta od dnia dołączenia i nie pisze. Limit wiadomości na minutę (`Chat:RateLimits`) dotyczy API, nie MCP:
 JARVIS ma własne limity. Ręcznie: MCP Inspector, Streamable HTTP `http://localhost:5410/plugins/chat/mcp`, nagłówek
 `Authorization: Bearer <token z przeglądarki>`.
+
+## JARVIS w czacie (HomeApps 2.3.0+, plan JARVIS-a sekcja 5)
+
+- Włącznik domu „JARVIS w czacie” (`GET/PUT settings` `{assistant}`, zmienia uprawnienie `chat.settings`, domyślnie
+  Admin); domyślnie wyłączony. Na liście rozmów pod spodem, tylko dla tych, którzy mogą go zmienić.
+- Budzi go wiadomość z `@Jarvis` (osobne słowo, dowolna wielkość liter, nie w kodzie ani cytacie) albo odpowiedź na jego
+  wiadomość, w „Dom” i pokojach, nigdy w rozmowach 1:1 ani z wiadomości wysłanych przez MCP. Czat wysyła
+  `AssistantInvoked` (kanał `chat`, `Reference` = `{conversationId}/{messageId}`, 10 poprzednich wiadomości jako
+  kontekst, czysty tekst z imionami).
+- `AssistantWorking` pokazuje „JARVIS pisze…”; `AssistantResponded` zapisuje jego wiadomość jako odpowiedź na pytanie
+  (autor `Assistant`, id autora = pusty GUID), z kartą akcji. Powtórzona odpowiedź nic nie zmienia; odpowiedź na
+  decyzję podmienia linię karty (`MessageEdited`). Bez powiadomień push.
+- Karta: przyciski „Potwierdź” / „Anuluj” ma tylko osoba, która pytała
+  (`POST messages/{id}/actions/{confirmationId}` `{approve}` → `202`, czat wysyła `AssistantConfirmed`); inni widzą
+  stan. W polu pisania `@` podpowiada „Jarvis” (Tab wstawia).
 
 ## Domena w skrócie
 
