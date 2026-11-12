@@ -83,4 +83,10 @@ public static class ChatErrors
 
     public static Error AttachmentNotPending => new AppError("attachment.not_pending",
         "The attachment was already checked.", ErrorKind.Conflict);
+
+    public static Error AssistantNotAsker => new AppError("assistant.not_asker",
+        "Only the person who asked JARVIS confirms his actions.", ErrorKind.Forbidden);
+
+    public static Error AssistantActionNotWaiting => new AppError("assistant.not_waiting",
+        "This action does not wait for a confirmation.", ErrorKind.Conflict);
 }

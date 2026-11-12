@@ -1,3 +1,4 @@
+using Chat.Domain.Assistant;
 using Chat.Domain.Attachments;
 using Chat.Domain.Common;
 using Chat.Domain.Conversations;
@@ -16,6 +17,7 @@ public sealed class Message
 
     private readonly List<Guid> _attachmentIds = [];
     private readonly List<Reaction> _reactions = [];
+    private readonly List<AssistantAction> _actions = [];
 
     private Message() { }
 
@@ -31,6 +33,7 @@ public sealed class Message
         ClientMessageId = clientMessageId;
         SentVia = via;
         SentAt = now;
+        MentionsAssistant = AssistantMention.In(text?.Value);
     }
 
     public Guid Id { get; private set; }
@@ -39,7 +42,13 @@ public sealed class Message
 
     public Guid HouseholdId { get; private set; }
 
+    /// <summary>A person's id, or <see cref="AssistantId"/> for JARVIS.</summary>
     public Guid AuthorId { get; private set; }
+
+    public AuthorKind AuthorKind { get; private set; }
+
+    /// <summary><c>@Jarvis</c> in the text as sent (<see cref="AssistantMention"/>).</summary>
+    public bool MentionsAssistant { get; private set; }
 
     /// <summary><c>null</c> for photos without words, and for a deleted message.</summary>
     public MessageText? Text { get; private set; }
@@ -65,6 +74,9 @@ public sealed class Message
     public IReadOnlyList<Guid> AttachmentIds => _attachmentIds;
 
     public IReadOnlyList<Reaction> Reactions => _reactions;
+
+    /// <summary>JARVIS's action card; empty for people's messages.</summary>
+    public IReadOnlyList<AssistantAction> Actions => _actions;
 
     public bool IsDeleted => DeletedAt is not null;
 
@@ -135,6 +147,65 @@ public sealed class Message
 
         conversation.MessageArrived(now);
         return message;
+    }
+
+    /// <summary>JARVIS's author id in every conversation: he is not a person and not a member.</summary>
+    public static readonly Guid AssistantId = Guid.Empty;
+
+    /// <summary>
+    /// Whether this message asks JARVIS (jarvis-v1.md 5.1): it mentions him or answers one of his messages. Never in a
+    /// direct conversation, and never a message written through MCP, so JARVIS cannot wake himself.
+    /// </summary>
+    public bool AsksAssistant(Conversation conversation, Message? replyTo)
+    {
+        ArgumentNullException.ThrowIfNull(conversation);
+        return AuthorKind == AuthorKind.Person
+            && SentVia == SentVia.App
+            && conversation.Kind != ConversationKind.Direct
+            && (MentionsAssistant || replyTo?.AuthorKind == AuthorKind.Assistant);
+    }
+
+    /// <summary>
+    /// JARVIS answers <paramref name="asked"/> in its conversation, with his action card. His client id is the
+    /// invocation's, so a repeated answer finds this message. Too long or odd text is cut, never refused.
+    /// </summary>
+    public static Message FromAssistant(
+        Conversation conversation, Message asked, Guid invocationId, string text, IEnumerable<AssistantAction> actions, TimeProvider time)
+    {
+        ArgumentNullException.ThrowIfNull(conversation);
+        ArgumentNullException.ThrowIfNull(asked);
+        ArgumentNullException.ThrowIfNull(actions);
+        ArgumentNullException.ThrowIfNull(time);
+        var clean = new string([.. (text ?? string.Empty).Where(c => !char.IsControl(c) || c is '\n' or '\t')]);
+        if (clean.Length > MessageText.MaxLength)
+        {
+            clean = clean[..(MessageText.MaxLength - 1)] + "…";
+        }
+
+        var validText = MessageText.Create(clean).ValueOrDefault;
+        var now = time.GetUtcNow();
+        var message = new Message(Guid.CreateVersion7(now), conversation, AssistantId, validText, asked.Id, invocationId, SentVia.App, now)
+        {
+            AuthorKind = AuthorKind.Assistant,
+            MentionsAssistant = false,
+        };
+        message._actions.AddRange(actions);
+        conversation.MessageArrived(now);
+        return message;
+    }
+
+    /// <summary>The card line JARVIS updated after a decision; <c>false</c> when this message has no such line.</summary>
+    public bool UpdateAction(AssistantAction action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        var index = _actions.FindIndex(a => a.ConfirmationId is not null && a.ConfirmationId == action.ConfirmationId);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        _actions[index] = action;
+        return true;
     }
 
     /// <summary>Whether someone who sees the conversation from <paramref name="readsFrom"/> on sees this message (C3).</summary>
