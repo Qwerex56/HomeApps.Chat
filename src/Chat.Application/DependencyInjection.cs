@@ -1,3 +1,4 @@
+using Chat.Application.Assistant.AskAssistant;
 using Chat.Application.Common;
 using Chat.Application.Notifications;
 using HomeApps.Plugins;
@@ -21,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<Actors>();
         services.AddScoped<AfterCommit>();
         services.AddScoped<MessageNotifier>();
+        services.AddScoped<AssistantCaller>();
         return services;
     }
 }

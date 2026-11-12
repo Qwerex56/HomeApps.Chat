@@ -1,4 +1,5 @@
 using Chat.Application.Abstractions;
+using Chat.Application.Assistant.AskAssistant;
 using Chat.Application.Common;
 using Chat.Application.Notifications;
 using Chat.Domain.Common;
@@ -14,6 +15,7 @@ internal sealed class SendMessageHandler(
     IAttachmentRepository attachments,
     Actors actors,
     MessageNotifier notifier,
+    AssistantCaller assistant,
     AfterCommit after,
     TimeProvider time)
     : ICommandHandler<SendMessageCommand, Guid>
@@ -57,6 +59,7 @@ internal sealed class SendMessageHandler(
         after.Signal(conversation.Value, SignalNames.MessageSent,
             new { command.HouseholdId, command.ConversationId, MessageId = message.Value.Id, AuthorId = actor.UserId });
         await notifier.NotifyAsync(conversation.Value, message.Value, ordered, cancellationToken);
+        await assistant.AskIfAskedAsync(conversation.Value, message.Value, replyTo, cancellationToken);
         return message.Value.Id;
     }
 }

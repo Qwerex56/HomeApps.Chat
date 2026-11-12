@@ -12,4 +12,5 @@ public static class SignalNames
     public const string AttachmentChanged = "AttachmentChanged";
     public const string Typing = "Typing";
     public const string AccessChanged = "AccessChanged";
+    public const string AssistantWorking = "AssistantWorking";
 }

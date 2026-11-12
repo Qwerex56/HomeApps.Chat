@@ -1,4 +1,5 @@
 using HomeApps.Contracts.Accounts;
+using HomeApps.Contracts.Assistant;
 using HomeApps.Contracts.Households;
 using HomeApps.Plugins.Manifest;
 
@@ -24,6 +25,9 @@ public static class ChatPlugin
 
     /// <summary>Delete other people's messages in the household's conversation.</summary>
     public const string Moderate = "chat.moderate";
+
+    /// <summary>The household's chat settings, e.g. "JARVIS w czacie" (JV10).</summary>
+    public const string Settings = "chat.settings";
 
     /// <summary>The one kind of notification: a new message.</summary>
     public const string MessageNotification = "message";
@@ -51,6 +55,7 @@ public static class ChatPlugin
             new PluginPermission(Direct, HouseholdRole.Member, new LocalizedText("Rozmowy prywatne", "Direct conversations")),
             new PluginPermission(Rooms, HouseholdRole.Member, new LocalizedText("Zakładanie pokoi", "Create rooms")),
             new PluginPermission(Moderate, HouseholdRole.Admin, new LocalizedText("Usuwanie cudzych wiadomości w rozmowie domu", "Delete others' messages in the household's conversation")),
+            new PluginPermission(Settings, HouseholdRole.Admin, new LocalizedText("Ustawienia czatu, np. JARVIS w czacie", "Chat settings, e.g. JARVIS in the chat")),
         ],
         Realtime = Hub,
         Ui = new PluginUi
@@ -61,6 +66,8 @@ public static class ChatPlugin
         },
         Mcp = new PluginMcp(["send_message", "unread_summary", "read_conversation"]),
         Notifications = [new PluginNotificationCategory(MessageNotification, new LocalizedText("Wiadomości", "Messages"))],
-        Events = new PluginEvents([], [typeof(MemberLeft), typeof(MemberRoleChanged), typeof(UserErased)]),
+        Events = new PluginEvents(
+            [typeof(AssistantInvoked), typeof(AssistantConfirmed)],
+            [typeof(MemberLeft), typeof(MemberRoleChanged), typeof(UserErased), typeof(AssistantWorking), typeof(AssistantResponded)]),
     };
 }
