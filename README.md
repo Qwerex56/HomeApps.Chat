@@ -12,7 +12,7 @@ z lokalnego feedu) oraz kontraktu pluginów (`docs/plugins.md` w HomeApps). Plan
 | C2 `chat/api` | Application, Infrastructure, Api (port 5410), hub SignalR, media | gotowe |
 | C3 `chat/web` | UI pluginu (`src/Chat.Web`) i widżet | gotowe |
 | C4 `chat/docker` | obraz z `ffmpeg`, `compose.yaml`, wolumin `chat_media` | gotowe |
-| C5 `chat/mcp` | narzędzia MCP dla JARVIS-a | po 1.0 |
+| C5 `chat/mcp` | narzędzia MCP dla JARVIS-a (etap J1 planu JARVIS-a, kit 2.3.0) | gotowe |
 
 ## Wymagania
 
@@ -70,6 +70,23 @@ nazwa, uczestnicy, `leave` z `successorId`, `archive`), `messages/{id}` (edycja,
 Hub `/plugins/chat/hub` (`?access_token=`): `Watch(householdId)`, `Open(conversationId?)`, `Typing(householdId,
 conversationId)`; do klienta idą małe sygnały z samymi id: `MessageSent`, `MessageEdited`, `MessageDeleted`,
 `ReactionChanged`, `ReadMarkerMoved`, `ConversationChanged`, `AttachmentChanged`, `Typing`, `AccessChanged`.
+
+## MCP (`/plugins/chat/mcp`, HomeApps 2.3.0+)
+
+Dla JARVIS-a i innych klientów MCP, z tokenem osoby (też delegowanym), te same sprawdzenia uprawnień co API. Dom i
+rozmowę podaje się nazwą (bez względu na wielkość liter) albo id: „Dom”, nazwa pokoju albo imię osoby (rozmowa 1:1).
+Nazwa pasująca do kilku rozmów daje listę do wyboru zamiast zgadywania. Odpowiedzi to czysty tekst bez Markdownu,
+czas w lokalnej strefie serwera. Czytanie niczego nie oznacza jako przeczytane.
+
+| Narzędzie | Argumenty | Co |
+|---|---|---|
+| `send_message` | `text`, `to?` (osoba, pokój, domyślnie „Dom”), `household?` | wysyła z `SentVia = Mcp`; rozmowę 1:1 zakłada, gdy jej nie ma; w UI dopisek „przez JARVIS-a” |
+| `unread_summary` | `household?` (pominięty = wszystkie domy z włączonym czatem) | rozmowy z nieprzeczytanymi i do 10 najnowszych cudzych wiadomości z każdej |
+| `read_conversation` | `with?` (domyślnie „Dom”), `limit?` (1–100, domyślnie 20), `household?` | ostatnie wiadomości, od najstarszej, z opisem załączników („zdjęcie 1600×1200”) |
+
+Gość czyta od dnia dołączenia i nie pisze. Limit wiadomości na minutę (`Chat:RateLimits`) dotyczy API, nie MCP:
+JARVIS ma własne limity. Ręcznie: MCP Inspector, Streamable HTTP `http://localhost:5410/plugins/chat/mcp`, nagłówek
+`Authorization: Bearer <token z przeglądarki>`.
 
 ## Domena w skrócie
 
