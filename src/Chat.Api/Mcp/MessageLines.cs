@@ -1,3 +1,4 @@
+using Chat.Application.Assistant.AskAssistant;
 using System.Globalization;
 using System.Text;
 using Chat.Application.Common;
@@ -14,7 +15,7 @@ internal static class MessageLines
     {
         var at = TimeZoneInfo.ConvertTime(message.SentAt, zone);
         var line = new StringBuilder(string.Create(CultureInfo.InvariantCulture,
-            $"- {names.GetValueOrDefault(message.AuthorId, FormerMember)}, {at:yyyy-MM-dd HH:mm}"));
+            $"- {(message.AuthorKind == AuthorKind.Assistant ? AssistantCaller.AssistantName : names.GetValueOrDefault(message.AuthorId, FormerMember))}, {at:yyyy-MM-dd HH:mm}"));
         if (message.SentVia == SentVia.Mcp)
         {
             line.Append(" (via JARVIS)");
