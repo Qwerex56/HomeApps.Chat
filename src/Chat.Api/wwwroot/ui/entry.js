@@ -1,4 +1,4 @@
-import { B as e, C as t, D as n, F as r, L as i, O as a, P as o, R as s, S as c, V as l, W as u, b as d, f, g as p, h as m, i as h, m as g, n as _, r as v, s as y, t as b, u as x, v as S, w as C, x as w } from "./_plugin-vue_export-helper-C1WJ0WEO.js";
+import { C as e, F as t, G as n, H as r, I as i, O as a, R as o, S as s, T as c, V as l, _ as u, c as d, d as f, g as p, h as m, i as h, k as g, n as _, p as v, r as y, t as b, w as x, x as S, y as C, z as w } from "./_plugin-vue_export-helper-B9B-GG00.js";
 // src/ChatWidget.vue?vue&type=script&setup=true&lang.ts
 var T = { class: "chat-widget" }, E = {
 	key: 0,
@@ -9,22 +9,22 @@ var T = { class: "chat-widget" }, E = {
 }, O = { class: "chat-widget__text" }, k = ["datetime"], A = {
 	key: 1,
 	class: "chat-widget__empty"
-}, j = p({
+}, j = u({
 	id: "chat",
-	routes: { "": () => import("./ChatPage-VGaSiryI.js") },
-	widgets: { chat: /* @__PURE__ */ b(/* @__PURE__ */ a({
+	routes: { "": () => import("./ChatPage-BGYOOSW_.js") },
+	widgets: { chat: /* @__PURE__ */ b(/* @__PURE__ */ g({
 		__name: "ChatWidget",
 		props: {
 			householdId: {},
 			place: {}
 		},
-		setup(a) {
-			let p = a, { host: b, api: j, conversations: M, nameOf: N } = h(() => p.householdId), P = f(), F = m(), I = d(() => M.data.value?.find((e) => e.kind === "Household") ?? null), L = d(() => (M.data.value ?? []).reduce((e, t) => e + t.unread, 0)), R = g({
-				queryKey: d(() => v.recent(p.householdId, I.value?.id ?? null)),
+		setup(u) {
+			let g = u, { host: b, api: j, conversations: M, nameOf: N } = h(() => g.householdId), P = v(), F = p(), I = S(() => M.data.value?.find((e) => e.kind === "Household") ?? null), L = S(() => (M.data.value ?? []).reduce((e, t) => e + t.unread, 0)), R = m({
+				queryKey: S(() => y.recent(g.householdId, I.value?.id ?? null)),
 				queryFn: () => j.value.messages(I.value.id, {}, 8),
-				enabled: d(() => !!I.value),
+				enabled: S(() => !!I.value),
 				refetchInterval: _
-			}), z = d(() => (R.data.value ?? []).filter((e) => !e.deleted).slice(-4)), B = x(b.manifest.endpoints.realtime ?? "/plugins/chat/hub", b.accessToken, p.householdId), V = () => F.invalidateQueries({ queryKey: v.all(p.householdId) }), H = [
+			}), z = S(() => (R.data.value ?? []).filter((e) => !e.deleted).slice(-4)), B = f(b.manifest.endpoints.realtime ?? "/plugins/chat/hub", b.accessToken, g.householdId), V = () => F.invalidateQueries({ queryKey: y.all(g.householdId) }), H = [
 				B.on("MessageSent", V),
 				B.on("MessageEdited", V),
 				B.on("MessageDeleted", V),
@@ -32,34 +32,34 @@ var T = { class: "chat-widget" }, E = {
 				B.on("ConversationChanged", V),
 				B.onReconnected(V)
 			];
-			o(() => {
+			t(() => {
 				H.forEach((e) => e()), B.stop();
 			});
-			let U = (e) => e.length === 1 ? b.t(e[0].kind === "Video" ? "media.video" : "media.photo") : b.t("media.count", { count: e.length }), W = d(() => `/homes/${p.householdId}/apps/chat`);
-			return (a, o) => {
-				let d = s("Skeleton"), f = s("Badge"), p = s("RouterLink");
-				return r(), t("div", T, [l(M).isPending.value || l(R).isPending.value ? (r(), t("div", E, [(r(), t(S, null, i(3, (e) => n(d, {
+			let U = (e) => e.length === 1 ? b.t(e[0].kind === "Video" ? "media.video" : "media.photo") : b.t("media.count", { count: e.length }), W = S(() => `/homes/${g.householdId}/apps/chat`);
+			return (t, u) => {
+				let f = w("Skeleton"), p = w("Badge"), m = w("RouterLink");
+				return i(), x("div", T, [r(M).isPending.value || r(R).isPending.value ? (i(), x("div", E, [(i(), x(C, null, o(3, (e) => a(f, {
 					key: e,
 					height: "1.5rem"
-				})), 64))])) : (r(), t(S, { key: 1 }, [z.value.length ? (r(), t("ul", D, [(r(!0), t(S, null, i(z.value, (n) => (r(), t("li", { key: n.id }, [
-					C("strong", null, e(l(N)(n.authorId)), 1),
-					C("span", O, e(l(y)(n.text, 120) || U(n.attachments)), 1),
-					C("time", { datetime: n.sentAt }, e(l(P).when(n.sentAt)), 9, k)
-				]))), 128))])) : (r(), t("p", A, e(l(b).t("widget.empty")), 1)), n(p, {
+				})), 64))])) : (i(), x(C, { key: 1 }, [z.value.length ? (i(), x("ul", D, [(i(!0), x(C, null, o(z.value, (e) => (i(), x("li", { key: e.id }, [
+					c("strong", null, l(r(N)(e.authorId)), 1),
+					c("span", O, l(r(d)(e.text, 120) || U(e.attachments)), 1),
+					c("time", { datetime: e.sentAt }, l(r(P).when(e.sentAt)), 9, k)
+				]))), 128))])) : (i(), x("p", A, l(r(b).t("widget.empty")), 1)), a(m, {
 					to: W.value,
 					class: "chat-widget__open"
 				}, {
-					default: u(() => [
-						o[0] ||= C("i", {
+					default: n(() => [
+						u[0] ||= c("i", {
 							class: "pi pi-comments",
 							"aria-hidden": "true"
 						}, null, -1),
-						C("span", null, e(l(b).t("widget.open")), 1),
-						L.value ? (r(), w(f, {
+						c("span", null, l(r(b).t("widget.open")), 1),
+						L.value ? (i(), s(p, {
 							key: 0,
 							value: L.value > 99 ? "99+" : L.value,
-							"aria-label": l(b).t("widget.unread", { count: L.value })
-						}, null, 8, ["value", "aria-label"])) : c("", !0)
+							"aria-label": r(b).t("widget.unread", { count: L.value })
+						}, null, 8, ["value", "aria-label"])) : e("", !0)
 					]),
 					_: 1
 				}, 8, ["to"])], 64))]);
@@ -190,6 +190,24 @@ var T = { class: "chat-widget" }, E = {
 				open: "Otwórz czat",
 				empty: "W rozmowie domu nikt jeszcze nie napisał.",
 				unread: "Nieprzeczytane: {count}"
+			},
+			assistant: {
+				name: "JARVIS",
+				setting: "JARVIS w czacie",
+				mentionHint: "Tab, żeby wstawić",
+				actions: "Co zrobił JARVIS",
+				confirm: "Potwierdź",
+				cancel: "Anuluj",
+				until: "do {time}",
+				expired: "Wygasło, poproś jeszcze raz.",
+				waitsForAsker: "Czeka na potwierdzenie osoby, która prosiła.",
+				status: {
+					Done: "Zrobione",
+					Failed: "Nie udało się",
+					NeedsConfirmation: "Czeka",
+					Denied: "Anulowane",
+					Expired: "Wygasło"
+				}
 			}
 		},
 		en: {
@@ -315,6 +333,24 @@ var T = { class: "chat-widget" }, E = {
 				open: "Open chat",
 				empty: "Nobody has written in the household conversation yet.",
 				unread: "Unread: {count}"
+			},
+			assistant: {
+				name: "JARVIS",
+				setting: "JARVIS in the chat",
+				mentionHint: "Tab to insert",
+				actions: "What JARVIS did",
+				confirm: "Confirm",
+				cancel: "Cancel",
+				until: "until {time}",
+				expired: "Expired, ask again.",
+				waitsForAsker: "Waits for the person who asked.",
+				status: {
+					Done: "Done",
+					Failed: "Failed",
+					NeedsConfirmation: "Waiting",
+					Denied: "Cancelled",
+					Expired: "Expired"
+				}
 			}
 		}
 	}

@@ -97,4 +97,16 @@ export default {
     archived: 'The room was archived.',
   },
   widget: { open: 'Open chat', empty: 'Nobody has written in the household conversation yet.', unread: 'Unread: {count}' },
+  assistant: {
+    name: 'JARVIS',
+    setting: 'JARVIS in the chat',
+    mentionHint: 'Tab to insert',
+    actions: 'What JARVIS did',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    until: 'until {time}',
+    expired: 'Expired, ask again.',
+    waitsForAsker: 'Waits for the person who asked.',
+    status: { Done: 'Done', Failed: 'Failed', NeedsConfirmation: 'Waiting', Denied: 'Cancelled', Expired: 'Expired' },
+  },
 }

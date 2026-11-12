@@ -6,6 +6,7 @@ const message = (id: string, authorId: string, sentAt: string): MessageView => (
   id,
   conversationId: 'c',
   authorId,
+  authorKind: 'Person',
   clientMessageId: `client-${id}`,
   text: id,
   replyTo: null,
@@ -15,6 +16,7 @@ const message = (id: string, authorId: string, sentAt: string): MessageView => (
   deleted: false,
   attachments: [],
   reactions: [],
+  actions: [],
 })
 
 describe('buildTimeline', () => {

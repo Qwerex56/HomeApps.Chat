@@ -4,6 +4,7 @@ import { useHost } from '@homeapps/plugin-sdk'
 import { errorCode, newId, type AttachmentView, type ChatApi, type MessageView } from './api'
 import { useSignal, type ChatHub } from './hub'
 import { toggleMark } from './markdown'
+import { completeMention, mentionAt } from './mention'
 import { checkFile, isVideo, MAX_ATTACHMENTS, problemOf, type FileProblem } from './media'
 
 // The text field: Enter sends, Shift+Enter breaks the line, Ctrl+B / Ctrl+I mark the selection. Photos and films are
@@ -14,6 +15,8 @@ const props = defineProps<{
   replyTo: MessageView | null
   editing: MessageView | null
   nameOf: (userId: string | null | undefined) => string
+  /** JARVIS listens here: the @ hint offers him. */
+  assistant: boolean
 }>()
 const emit = defineEmits<{
   send: [text: string | null, attachments: AttachmentView[]]
@@ -25,6 +28,7 @@ const emit = defineEmits<{
 const host = useHost()
 
 const TEXT_MAX = 4000
+const ASSISTANT_NAME = 'Jarvis'
 const POLL_MS = 3_000
 
 interface Upload {
@@ -41,6 +45,24 @@ interface Upload {
 }
 
 const text = ref('')
+const caret = ref(0)
+const mention = computed(() => {
+  if (!props.assistant || props.editing) return null
+  const at = mentionAt(text.value, caret.value)
+  return at && ASSISTANT_NAME.toLowerCase().startsWith(at.query.toLowerCase()) ? at : null
+})
+function pickMention() {
+  const element = input()
+  if (!mention.value || !element) return
+  const next = completeMention(text.value, mention.value, caret.value, ASSISTANT_NAME)
+  text.value = next.text
+  caret.value = next.caret
+  void nextTick(() => {
+    element.focus()
+    element.setSelectionRange(next.caret, next.caret)
+  })
+}
+const trackCaret = () => (caret.value = input()?.selectionStart ?? text.value.length)
 const uploads = ref<Upload[]>([])
 const field = ref<{ $el: HTMLTextAreaElement } | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -171,6 +193,7 @@ function submit() {
 
 let lastTyping = 0
 function onInput() {
+  trackCaret()
   const now = Date.now()
   if (props.editing || now - lastTyping < 3_000 || !text.value) return
   lastTyping = now
@@ -178,6 +201,11 @@ function onInput() {
 }
 
 function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Tab' && mention.value) {
+    event.preventDefault()
+    pickMention()
+    return
+  }
   if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
     event.preventDefault()
     submit()
@@ -265,6 +293,10 @@ function onPaste(event: ClipboardEvent) {
           @click="cameraInput?.click()"
         />
       </template>
+      <button v-if="mention" type="button" class="chat-composer__mention" @mousedown.prevent="pickMention">
+        <i class="pi pi-sparkles" aria-hidden="true" /> @{{ ASSISTANT_NAME }}
+        <span>{{ host.t('assistant.mentionHint') }}</span>
+      </button>
       <Textarea
         ref="field"
         v-model="text"
@@ -276,6 +308,8 @@ function onPaste(event: ClipboardEvent) {
         :aria-label="host.t('composer.placeholder')"
         @keydown="onKeydown"
         @input="onInput"
+        @click="trackCaret"
+        @keyup="trackCaret"
         @paste="onPaste"
       />
       <Button
@@ -314,9 +348,32 @@ function onPaste(event: ClipboardEvent) {
   text-overflow: ellipsis;
 }
 .chat-composer__row {
+  position: relative;
   display: flex;
   align-items: flex-end;
   gap: 0.25rem;
+}
+.chat-composer__mention {
+  position: absolute;
+  bottom: calc(100% + 0.25rem);
+  left: 0.75rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 999px;
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+}
+.chat-composer__mention span {
+  color: var(--p-text-muted-color);
+  font-size: 0.75rem;
 }
 .chat-composer__field {
   flex: 1;

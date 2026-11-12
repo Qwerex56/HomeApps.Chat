@@ -5211,7 +5211,9 @@ function Yu(e, t, n, r) {
 		end: n + r.length
 	};
 }
-function Xu(e, t, n) {
+// src/api.ts
+var Xu = "00000000-0000-0000-0000-000000000000";
+function Zu(e, t, n) {
 	let r = `${t}/households/${n}`, i = async (t, n) => (await e.get(`${r}${t}`, { params: n })).data;
 	return {
 		conversations: () => i("/conversations"),
@@ -5247,14 +5249,17 @@ function Xu(e, t, n) {
 				onUploadProgress: (e) => n(e.total ? e.loaded / e.total : 0)
 			})).data;
 		},
-		attachment: (e) => i(`/attachments/${e}`)
+		attachment: (e) => i(`/attachments/${e}`),
+		settings: () => i("/settings"),
+		changeSettings: async (t) => (await e.put(`${r}/settings`, t)).data,
+		decide: (t, n, i) => e.post(`${r}/messages/${t}/actions/${n}`, { approve: i })
 	};
 }
-function Zu(e) {
+function Qu(e) {
 	let t = e?.response?.data;
 	return typeof t?.code == "string" ? t.code : null;
 }
-function Qu() {
+function $u() {
 	if (typeof crypto.randomUUID == "function") return crypto.randomUUID();
 	let e = crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(16));
 	e[6] = e[6] & 15 | 64, e[8] = e[8] & 63 | 128;
@@ -5262,7 +5267,7 @@ function Qu() {
 	return `${t.slice(0, 8)}-${t.slice(8, 12)}-${t.slice(12, 16)}-${t.slice(16, 20)}-${t.slice(20)}`;
 }
 // src/useChat.ts
-var $u = 6e4, ed = {
+var ed = 6e4, td = {
 	all: (e) => [
 		"plugins",
 		"chat",
@@ -5280,6 +5285,12 @@ var $u = 6e4, ed = {
 		e,
 		"members"
 	],
+	settings: (e) => [
+		"plugins",
+		"chat",
+		e,
+		"settings"
+	],
 	recent: (e, t) => [
 		"plugins",
 		"chat",
@@ -5288,16 +5299,22 @@ var $u = 6e4, ed = {
 		t
 	]
 };
-function td(e) {
-	let t = Bn(), n = Rr(), r = C(() => nn(e)), i = C(() => Xu(t.http, t.apiBase, r.value)), a = C(() => t.user.value?.id ?? null), o = Lr({
-		queryKey: C(() => ed.conversations(r.value)),
+function nd(e) {
+	let t = Bn(), n = Rr(), r = C(() => nn(e)), i = C(() => Zu(t.http, t.apiBase, r.value)), a = C(() => t.user.value?.id ?? null), o = Lr({
+		queryKey: C(() => td.conversations(r.value)),
 		queryFn: () => i.value.conversations(),
-		refetchInterval: $u
+		refetchInterval: ed
 	}), s = Lr({
-		queryKey: C(() => ed.members(r.value)),
+		queryKey: C(() => td.members(r.value)),
 		queryFn: () => i.value.members(),
 		staleTime: 6e4
-	}), c = (e) => e ? s.data.value?.find((t) => t.userId === e) : void 0, l = (e) => c(e)?.name ?? t.t("someone"), u = (e) => c(e)?.avatarUrl ?? null, d = (e) => l(e).trim().charAt(0).toUpperCase() || "?", f = (e) => e.participantIds.find((e) => e !== a.value) ?? null;
+	}), c = (e) => e ? s.data.value?.find((t) => t.userId === e) : void 0, l = (e) => e === "00000000-0000-0000-0000-000000000000" ? t.t("assistant.name") : c(e)?.name ?? t.t("someone"), u = Lr({
+		queryKey: C(() => td.settings(r.value)),
+		queryFn: () => i.value.settings(),
+		staleTime: 6e4
+	}), d = async (e) => {
+		n.setQueryData(td.settings(r.value), await i.value.changeSettings(e));
+	}, f = (e) => c(e)?.avatarUrl ?? null, p = (e) => l(e).trim().charAt(0).toUpperCase() || "?", m = (e) => e.participantIds.find((e) => e !== a.value) ?? null;
 	return {
 		host: t,
 		api: i,
@@ -5306,22 +5323,25 @@ function td(e) {
 		conversations: o,
 		members: s,
 		nameOf: l,
-		avatarOf: u,
-		initialOf: d,
-		otherOf: f,
-		titleOf: (e) => e.kind === "Direct" ? l(f(e)) : e.kind === "Household" ? t.t("home") : e.name ?? "",
-		refreshConversations: () => n.invalidateQueries({ queryKey: ed.conversations(r.value) }),
-		refreshMembers: () => n.invalidateQueries({ queryKey: ed.members(r.value) }),
+		avatarOf: f,
+		initialOf: p,
+		otherOf: m,
+		titleOf: (e) => e.kind === "Direct" ? l(m(e)) : e.kind === "Household" ? t.t("home") : e.name ?? "",
+		refreshConversations: () => n.invalidateQueries({ queryKey: td.conversations(r.value) }),
+		refreshMembers: () => n.invalidateQueries({ queryKey: td.members(r.value) }),
 		canWrite: C(() => t.can("chat.write")),
 		canDirect: C(() => t.can("chat.direct")),
 		canRooms: C(() => t.can("chat.rooms")),
-		canModerate: C(() => t.can("chat.moderate"))
+		canModerate: C(() => t.can("chat.moderate")),
+		canSettings: C(() => t.can("chat.settings")),
+		assistantOn: C(() => u.data.value?.assistant ?? !1),
+		changeSettings: d
 	};
 }
 // \0plugin-vue:export-helper
-var nd = (e, t) => {
+var rd = (e, t) => {
 	let n = e.__vccOpts || e;
 	for (let [e, r] of t) n[e] = r;
 	return n;
 };
-export { ot as A, Zt as B, de as C, ye as D, ve as E, Ct as F, In as G, fn as H, Mt as I, Ft as L, lt as M, gt as N, Se as O, bt as P, Lt as R, ue as S, _e as T, En as U, on as V, jn as W, Bn as _, Zu as a, C as b, qu as c, sa as d, ei as f, Rn as g, Rr as h, td as i, D as j, it as k, Yu as l, Lr as m, $u as n, Qu as o, Qr as p, ed as r, Ju as s, nd as t, oa as u, d as v, fe as w, le as x, g as y, qt as z };
+export { it as A, qt as B, ue as C, ve as D, _e as E, bt as F, jn as G, on as H, Ct as I, In as K, Mt as L, D as M, lt as N, ye as O, gt as P, Ft as R, le as S, fe as T, fn as U, Zt as V, En as W, Rn as _, Xu as a, g as b, Ju as c, oa as d, sa as f, Rr as g, Lr as h, nd as i, ot as j, Se as k, qu as l, Qr as m, ed as n, Qu as o, ei as p, td as r, $u as s, rd as t, Yu as u, Bn as v, de as w, C as x, d as y, Lt as z };

@@ -56,10 +56,30 @@ export interface ReactionView {
   userIds: string[]
 }
 
+/** JARVIS writes as himself with this author id (jarvis-v1.md 5.1); he is not a member. */
+export const ASSISTANT_ID = '00000000-0000-0000-0000-000000000000'
+
+export type ActionStatus = 'Done' | 'Failed' | 'NeedsConfirmation' | 'Denied' | 'Expired'
+
+/** One line of JARVIS's action card, as he reported it. */
+export interface AssistantAction {
+  description: string
+  status: ActionStatus | string
+  url: string | null
+  confirmationId: string | null
+  confirmBy: string | null
+}
+
+export interface SettingsView {
+  /** "JARVIS w czacie": @Jarvis and replies to him wake JARVIS. */
+  assistant: boolean
+}
+
 export interface MessageView {
   id: string
   conversationId: string
   authorId: string
+  authorKind: 'Person' | 'Assistant'
   clientMessageId: string
   text: string | null
   replyTo: MessageQuoteView | null
@@ -69,6 +89,7 @@ export interface MessageView {
   deleted: boolean
   attachments: AttachmentView[]
   reactions: ReactionView[]
+  actions: AssistantAction[]
 }
 
 export interface UnreadView {
@@ -134,6 +155,12 @@ export function chatApi(http: AxiosInstance, apiBase: string, householdId: strin
       return response.data
     },
     attachment: (attachmentId: string) => get<AttachmentView>(`/attachments/${attachmentId}`),
+
+    settings: () => get<SettingsView>('/settings'),
+    changeSettings: async (settings: SettingsView) => (await http.put<SettingsView>(`${base}/settings`, settings)).data,
+    /** Only the person who asked; JARVIS answers with the new card line (MessageEdited). */
+    decide: (messageId: string, confirmationId: string, approve: boolean) =>
+      http.post(`${base}/messages/${messageId}/actions/${confirmationId}`, { approve }),
   }
 }
 

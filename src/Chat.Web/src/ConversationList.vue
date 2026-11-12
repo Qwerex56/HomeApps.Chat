@@ -6,7 +6,20 @@ import type { Chat } from './useChat'
 // The left column: "Dom" first, then rooms and direct conversations, each with its unread count.
 const props = defineProps<{ chat: Chat; conversations: ConversationView[]; selectedId: string | null; formatWhen: (iso: string) => string }>()
 const emit = defineEmits<{ select: [id: string]; newRoom: []; newDirect: [] }>()
-const { host, titleOf, otherOf, avatarOf, initialOf, canRooms, canDirect } = props.chat
+const { host, titleOf, otherOf, avatarOf, initialOf, canRooms, canDirect, canSettings, assistantOn, changeSettings } = props.chat
+
+// "JARVIS w czacie" (JV10): the household's Admin turns it on for all of its conversations except direct ones.
+const savingAssistant = ref(false)
+async function toggleAssistant(on: boolean) {
+  savingAssistant.value = true
+  try {
+    await changeSettings({ assistant: on })
+  } catch (error) {
+    host.notify('error', host.errorMessage(error))
+  } finally {
+    savingAssistant.value = false
+  }
+}
 
 const byRecent = (a: ConversationView, b: ConversationView) =>
   (b.lastMessageAt ?? b.createdAt).localeCompare(a.lastMessageAt ?? a.createdAt)
@@ -55,6 +68,10 @@ const groups = computed(() =>
         <span v-else-if="conversation.lastMessageAt" class="chat-list__when">{{ formatWhen(conversation.lastMessageAt) }}</span>
       </button>
     </template>
+    <label v-if="canSettings" class="chat-list__assistant">
+      <ToggleSwitch :model-value="assistantOn" :disabled="savingAssistant" @update:model-value="toggleAssistant" />
+      <span>{{ host.t('assistant.setting') }}</span>
+    </label>
     <button v-if="archived.length" type="button" class="chat-list__archive" @click="showArchived = !showArchived">
       <i :class="['pi', showArchived ? 'pi-chevron-up' : 'pi-chevron-down']" aria-hidden="true" />
       {{ host.t('list.archived', { count: archived.length }) }}
@@ -115,6 +132,15 @@ const groups = computed(() =>
 .chat-list__muted,
 .chat-list__when {
   font-size: 0.75rem;
+  color: var(--p-text-muted-color);
+}
+.chat-list__assistant {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding: 0.75rem 0.5rem 0.25rem;
+  font-size: 0.85rem;
   color: var(--p-text-muted-color);
 }
 .chat-list__archive {

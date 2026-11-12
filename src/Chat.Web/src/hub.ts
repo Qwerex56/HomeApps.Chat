@@ -41,6 +41,8 @@ export interface Signals {
   AttachmentChanged: AttachmentSignal
   Typing: TypingSignal
   AccessChanged: { householdId: string }
+  /** JARVIS took the question under messageId and works on it. */
+  AssistantWorking: MessageSignal
 }
 
 const RETRY_MS = 5_000

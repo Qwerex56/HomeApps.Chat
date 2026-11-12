@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useHost } from '@homeapps/plugin-sdk'
 import type { AttachmentView, MessageView } from './api'
+import ActionCard from './ActionCard.vue'
 import { renderMarkdown } from './markdown'
 
 // One message: who and when (on the first of a group), the quote it answers, text, photos and films, reactions.
@@ -20,12 +21,15 @@ const props = defineProps<{
   canReact: boolean
   /** Direct conversations: the other person has read up to here. */
   seen: boolean
+  /** For JARVIS's card: the time a waiting action may still be confirmed. */
+  timeOf: (iso: string) => string
 }>()
 const emit = defineEmits<{
   menu: [event: Event]
   react: [emoji: string, mine: boolean]
   media: [items: AttachmentView[], index: number]
   stale: []
+  decide: [confirmationId: string, approve: boolean, done: () => void]
 }>()
 const host = useHost()
 
@@ -40,14 +44,18 @@ const quoteText = computed(() => {
   return q.text || host.t('media.count', { count: q.attachments })
 })
 const ratio = (a: AttachmentView) => (media.value.length === 1 && a.width && a.height ? `${a.width} / ${a.height}` : '1 / 1')
+const fromAssistant = computed(() => props.message.authorKind === 'Assistant')
+/** His card's buttons belong to the person whose message he answers (JV9). */
+const asker = computed(() => fromAssistant.value && !!props.userId && quote.value?.authorId === props.userId)
 const reactionTitle = (userIds: string[]) => userIds.map((id) => props.nameOf(id)).join(', ')
 </script>
 
 <template>
   <div class="chat-message" :class="{ 'chat-message--mine': mine, 'chat-message--lead': lead }">
     <div class="chat-message__avatar">
+      <Avatar v-if="lead && fromAssistant" icon="pi pi-sparkles" shape="circle" class="chat-message__assistant" />
       <Avatar
-        v-if="lead && !mine"
+        v-else-if="lead && !mine"
         :image="avatarOf(message.authorId) ?? undefined"
         :label="avatarOf(message.authorId) ? undefined : nameOf(message.authorId).charAt(0).toUpperCase()"
         shape="circle"
@@ -97,6 +105,13 @@ const reactionTitle = (userIds: string[]) => userIds.map((id) => props.nameOf(id
           @click="emit('menu', $event)"
         />
       </div>
+      <ActionCard
+        v-if="message.actions.length && !message.deleted"
+        :actions="message.actions"
+        :can-decide="asker"
+        :time="timeOf"
+        @decide="(id, approve, done) => emit('decide', id, approve, done)"
+      />
       <div v-if="message.reactions.length && !message.deleted" class="chat-message__reactions">
         <button
           v-for="reaction in message.reactions"
@@ -236,6 +251,10 @@ const reactionTitle = (userIds: string[]) => userIds.map((id) => props.nameOf(id
   color: #fff;
   font-size: 1.5rem;
   background: rgb(0 0 0 / 0.25);
+}
+.chat-message__assistant {
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
 }
 .chat-message__meta {
   margin-top: 0.15rem;

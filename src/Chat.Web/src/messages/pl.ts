@@ -98,4 +98,16 @@ export default {
     archived: 'Pokój trafił do archiwum.',
   },
   widget: { open: 'Otwórz czat', empty: 'W rozmowie domu nikt jeszcze nie napisał.', unread: 'Nieprzeczytane: {count}' },
+  assistant: {
+    name: 'JARVIS',
+    setting: 'JARVIS w czacie',
+    mentionHint: 'Tab, żeby wstawić',
+    actions: 'Co zrobił JARVIS',
+    confirm: 'Potwierdź',
+    cancel: 'Anuluj',
+    until: 'do {time}',
+    expired: 'Wygasło, poproś jeszcze raz.',
+    waitsForAsker: 'Czeka na potwierdzenie osoby, która prosiła.',
+    status: { Done: 'Zrobione', Failed: 'Nie udało się', NeedsConfirmation: 'Czeka', Denied: 'Anulowane', Expired: 'Wygasło' },
+  },
 }

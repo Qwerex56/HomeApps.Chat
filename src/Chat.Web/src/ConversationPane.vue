@@ -16,7 +16,7 @@ import RoomPanel from './RoomPanel.vue'
 // field. The parent gives it a key per conversation, so everything here starts fresh for each one.
 const props = defineProps<{ chat: Chat; hub: ChatHub; conversation: ConversationView; typing: string[]; phone: boolean }>()
 const emit = defineEmits<{ back: []; left: [] }>()
-const { host, api, userId, nameOf, avatarOf, initialOf, otherOf, titleOf, canWrite, canModerate } = props.chat
+const { host, api, userId, nameOf, avatarOf, initialOf, otherOf, titleOf, canWrite, canModerate, assistantOn } = props.chat
 const format = useFormat()
 
 const REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🎉']
@@ -163,6 +163,17 @@ watch(
     if (now.archived && !before.archived) thread.notice(host.t('notice.archived'))
   },
 )
+
+// --- JARVIS's card: the decision goes to him; his new card line comes back as MessageEdited ------------------------
+async function decide(message: MessageView, confirmationId: string, approve: boolean, done: () => void) {
+  try {
+    await api.value.decide(message.id, confirmationId, approve)
+  } catch (error) {
+    fail(error)
+  } finally {
+    done()
+  }
+}
 
 // --- Writing ---------------------------------------------------------------------------------------------------
 const replyTo = ref<MessageView | null>(null)
@@ -323,10 +334,12 @@ const gallery = ref<{ items: AttachmentView[]; index: number } | null>(null)
             :can-act="canAct(row.message)"
             :can-react="writable"
             :seen="row.message.id === seenId"
+            :time-of="format.time"
             @menu="openMenu(row.message, $event)"
             @react="(emoji, mine) => react(row.message, emoji, mine)"
             @media="(items, index) => (gallery = { items, index })"
             @stale="thread.refreshMedia(row.message.id)"
+            @decide="(id, approve, done) => decide(row.message, id, approve, done)"
           />
           <div v-else class="chat-outgoing" :class="{ 'chat-outgoing--failed': row.message.failed, 'chat-outgoing--lead': row.lead }">
             <div class="chat-outgoing__bubble">
@@ -367,6 +380,7 @@ const gallery = ref<{ items: AttachmentView[]; index: number } | null>(null)
       :reply-to="replyTo"
       :editing="editing"
       :name-of="nameOf"
+      :assistant="assistantOn && conversation.kind !== 'Direct'"
       @send="send"
       @save="saveEdit"
       @cancel-reply="replyTo = null"

@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHost } from '@homeapps/plugin-sdk'
 import { useFormat } from './format'
+import { ASSISTANT_ID } from './api'
 import { createHub } from './hub'
 import { useChat } from './useChat'
 import ConversationList from './ConversationList.vue'
@@ -52,6 +53,8 @@ watch([() => selected.value?.id ?? null, visible], ([id, isVisible]) => hub.open
 
 // --- Signals -----------------------------------------------------------------------------------------------------
 const TYPING_MS = 5_000
+/** JARVIS's run ends within two minutes (Jarvis:ClaudeCode:Timeout). */
+const ASSISTANT_MS = 120_000
 const typing = ref<{ conversationId: string; userId: string; until: number }[]>([])
 const stopTyping = (conversationId: string, typist: string) =>
   (typing.value = typing.value.filter((t) => !(t.conversationId === conversationId && t.userId === typist)))
@@ -74,6 +77,13 @@ const off = [
     const until = Date.now() + TYPING_MS
     typing.value.push({ conversationId: signal.conversationId, userId: signal.userId, until })
     setTimeout(() => (typing.value = typing.value.filter((t) => t.until > Date.now())), TYPING_MS + 50)
+  }),
+  // JARVIS shows like someone typing until his answer arrives (or for as long as a run may take).
+  hub.on('AssistantWorking', (signal) => {
+    stopTyping(signal.conversationId, ASSISTANT_ID)
+    const until = Date.now() + ASSISTANT_MS
+    typing.value.push({ conversationId: signal.conversationId, userId: ASSISTANT_ID, until })
+    setTimeout(() => (typing.value = typing.value.filter((t) => t.until > Date.now())), ASSISTANT_MS + 50)
   }),
   hub.onReconnected(() => void chat.refreshConversations()),
 ]
