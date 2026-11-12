@@ -6,7 +6,7 @@ namespace Chat.Application;
 
 /// <summary>
 /// The chat plugin's manifest (plan section 3, docs/plugins.md in HomeApps). The UI is src/Chat.Web, built into
-/// Chat.Api/wwwroot/ui; MCP comes after 1.0 (C5).
+/// Chat.Api/wwwroot/ui; the MCP tools (Chat.Api/Mcp, plan section 8) since C5.
 /// </summary>
 public static class ChatPlugin
 {
@@ -38,7 +38,7 @@ public static class ChatPlugin
     {
         Id = "chat",
         Version = typeof(ChatPlugin).Assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "1.0.0",
-        MinHomeAppsVersion = "2.2.0",
+        MinHomeAppsVersion = "2.3.0",
         Name = new LocalizedText("Czat", "Chat"),
         Description = new LocalizedText("Rozmowy domowników: tekst, zdjęcia i filmy", "Household conversations: text, photos and videos"),
         Icon = "pi-comments",
@@ -59,6 +59,7 @@ public static class ChatPlugin
             // The household's page only: on /wall the chat would be read by whoever walks by (C12).
             Widgets = [new PluginWidget(Widget, new LocalizedText("Czat", "Chat"), WidgetSize.Medium, [WidgetPlace.Household])],
         },
+        Mcp = new PluginMcp(["send_message", "unread_summary", "read_conversation"]),
         Notifications = [new PluginNotificationCategory(MessageNotification, new LocalizedText("Wiadomości", "Messages"))],
         Events = new PluginEvents([], [typeof(MemberLeft), typeof(MemberRoleChanged), typeof(UserErased)]),
     };
