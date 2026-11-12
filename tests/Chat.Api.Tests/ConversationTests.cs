@@ -14,7 +14,7 @@ public sealed class ConversationTests(ChatFactory factory) : IClassFixture<ChatF
 
         Assert.Equal("chat", json["id"]!.GetValue<string>());
         Assert.Equal(
-            ["chat.read", "chat.write", "chat.direct", "chat.rooms", "chat.moderate"],
+            ["chat.read", "chat.write", "chat.direct", "chat.rooms", "chat.moderate", "chat.settings"],
             json["permissions"]!.AsArray().Select(p => p!["id"]!.GetValue<string>()));
         Assert.Equal("/plugins/chat/hub", json["endpoints"]!["realtime"]!.GetValue<string>());
         Assert.Equal("message", json["notifications"]![0]!["id"]!.GetValue<string>());
