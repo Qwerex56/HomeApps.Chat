@@ -170,9 +170,11 @@ async function decide(message: MessageView, confirmationId: string, approve: boo
     await api.value.decide(message.id, confirmationId, approve)
   } catch (error) {
     fail(error)
-  } finally {
+    // Not waiting any more (409 assistant.not_waiting) or otherwise stale: show what the server has.
+    void thread.refresh(message.id)
     done()
   }
+  // On success the button stays busy until MessageEdited replaces the card line (ActionCard clears it then).
 }
 
 // --- Writing ---------------------------------------------------------------------------------------------------

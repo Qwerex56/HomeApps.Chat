@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useHost } from '@homeapps/plugin-sdk'
 import type { AssistantAction } from './api'
 
@@ -35,6 +35,12 @@ function decide(action: AssistantAction, approve: boolean) {
   busy.value = action.confirmationId
   emit('decide', action.confirmationId, approve, () => (busy.value = null))
 }
+
+// The decision is in flight until JARVIS's answer changes the card line (MessageEdited), not until the POST returns.
+watch(
+  () => props.actions.map((a) => a.status).join(),
+  () => (busy.value = null),
+)
 </script>
 
 <template>
