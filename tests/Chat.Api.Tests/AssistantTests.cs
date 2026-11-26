@@ -111,6 +111,47 @@ public sealed class AssistantTests(ChatFactory factory) : IClassFixture<ChatFact
     }
 
     [Fact]
+    public async Task A_second_decision_on_the_same_action_is_refused_and_the_action_runs_only_once()
+    {
+        var h = await OnAsync();
+        var home = await h.HomeAsync();
+        var asked = await h.SendAsync(h.Member, home, "@Jarvis ustaw głośność na 30");
+        var reference = $"{home}/{asked.Id}";
+        var confirmation = Guid.NewGuid();
+        await AnswerAsync(Assist(home).InvocationId, reference, "Czeka na potwierdzenie.",
+            new AssistantAction("Głośność 30", "NeedsConfirmation", null, confirmation, factory.Time.GetUtcNow().AddMinutes(10)));
+        var card = (await h.MessagesAsync(h.Member, home)).Single(m => m.AuthorKind == AuthorKind.Assistant);
+        var decide = $"{h.Api}/messages/{card.Id}/actions/{confirmation}";
+        (await h.As(h.Member).PostAsJsonAsync(decide, new { approve = true })).EnsureSuccessStatusCode();
+        await AnswerAsync(confirmation, reference, "Gotowe", new AssistantAction("Głośność 30", "Done", null, confirmation, null));
+
+        var again = await h.As(h.Member).PostAsJsonAsync(decide, new { approve = true });
+        var otherTab = await h.As(h.Member).PostAsJsonAsync(decide, new { approve = false });
+
+        Assert.Equal((HttpStatusCode.Conflict, "assistant.not_waiting"), (again.StatusCode, await AHousehold.CodeOf(again)));
+        Assert.Equal((HttpStatusCode.Conflict, "assistant.not_waiting"), (otherTab.StatusCode, await AHousehold.CodeOf(otherTab)));
+        Assert.Single(factory.Published.OfType<AssistantConfirmed>(), c => c.ConfirmationId == confirmation);
+    }
+
+    [Fact]
+    public async Task A_decision_after_the_ten_minutes_is_refused_and_the_action_does_not_run()
+    {
+        var h = await OnAsync();
+        var home = await h.HomeAsync();
+        var asked = await h.SendAsync(h.Member, home, "@Jarvis usuń listę Zakupy");
+        var confirmation = Guid.NewGuid();
+        await AnswerAsync(Assist(home).InvocationId, $"{home}/{asked.Id}", "Czeka na potwierdzenie.",
+            new AssistantAction("Usunięto listę Zakupy", "NeedsConfirmation", null, confirmation, factory.Time.GetUtcNow().AddMinutes(10)));
+        var card = (await h.MessagesAsync(h.Member, home)).Single(m => m.AuthorKind == AuthorKind.Assistant);
+        factory.Time.Advance(TimeSpan.FromMinutes(11));
+
+        var late = await h.As(h.Member).PostAsJsonAsync($"{h.Api}/messages/{card.Id}/actions/{confirmation}", new { approve = true });
+
+        Assert.Equal((HttpStatusCode.Conflict, "assistant.not_waiting"), (late.StatusCode, await AHousehold.CodeOf(late)));
+        Assert.DoesNotContain(factory.Published.OfType<AssistantConfirmed>(), c => c.ConfirmationId == confirmation);
+    }
+
+    [Fact]
     public async Task Never_in_a_direct_conversation()
     {
         var h = await OnAsync();
