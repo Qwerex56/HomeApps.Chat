@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
+using Chat.Application.Common;
 using Chat.Application.Settings;
 using Chat.Domain.Messages;
 using HomeApps.Contracts.Assistant;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Chat.Api.Tests;
 
@@ -82,6 +84,30 @@ public sealed class AssistantTests(ChatFactory factory) : IClassFixture<ChatFact
         Assert.Equal((h.Member, true, "chat", reference), (decided.UserId, decided.Approved, decided.Channel, decided.Reference));
         var updated = (await h.MessagesAsync(h.Member, home)).Single(m => m.AuthorKind == AuthorKind.Assistant);
         Assert.Equal(("Done", "Usunięto listę Zakupy"), (updated.Actions[0].Status, updated.Actions[0].Description));
+    }
+
+    [Fact]
+    public async Task A_decision_in_the_household_chat_reaches_everyone_as_MessageEdited_without_a_refresh()
+    {
+        var h = await OnAsync();
+        var home = await h.HomeAsync();
+        var asked = await h.SendAsync(h.Member, home, "@Jarvis ustaw głośność na 30");
+        var confirmation = Guid.NewGuid();
+        await AnswerAsync(Assist(home).InvocationId, $"{home}/{asked.Id}", "Czeka na potwierdzenie.",
+            new AssistantAction("Głośność 30", "NeedsConfirmation", null, confirmation, factory.Time.GetUtcNow().AddMinutes(10)));
+        var card = (await h.MessagesAsync(h.Member, home)).Single(m => m.AuthorKind == AuthorKind.Assistant);
+        await using var other = await factory.ConnectAsync(h.Other);
+        var hears = new Signals(other, SignalNames.MessageEdited, SignalNames.MessageSent);
+        await other.InvokeAsync("Watch", h.Id);
+
+        (await h.As(h.Member).PostAsJsonAsync($"{h.Api}/messages/{card.Id}/actions/{confirmation}", new { approve = true })).EnsureSuccessStatusCode();
+        await AnswerAsync(confirmation, $"{home}/{asked.Id}", "Gotowe", new AssistantAction("Głośność 30", "Done", null, confirmation, null));
+
+        var edited = await hears.WaitForAsync(SignalNames.MessageEdited);
+        Assert.Equal(card.Id, edited.GetProperty("messageId").GetGuid());
+        Assert.Empty(hears.Of(SignalNames.MessageSent));
+        var now = (await h.MessagesAsync(h.Other, home)).Single(m => m.AuthorKind == AuthorKind.Assistant);
+        Assert.Equal("Done", Assert.Single(now.Actions).Status);
     }
 
     [Fact]

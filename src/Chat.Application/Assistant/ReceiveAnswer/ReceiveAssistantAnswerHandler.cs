@@ -29,7 +29,8 @@ internal sealed class ReceiveAssistantAnswerHandler(
             return Result.Ok();
         }
 
-        var updated = command.Actions.Count == 1 ? replies.FirstOrDefault(r => r.UpdateAction(command.Actions[0])) : null;
+        var incomingAction = command.Actions.Count > 0 ? command.Actions[0] : null;
+        var updated = incomingAction is not null ? replies.FirstOrDefault(r => r.UpdateAction(incomingAction)) : null;
         if (updated is not null)
         {
             after.Signal(conversation, SignalNames.MessageEdited,
