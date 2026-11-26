@@ -111,6 +111,31 @@ public sealed class AssistantTests(ChatFactory factory) : IClassFixture<ChatFact
     }
 
     [Fact]
+    public async Task Denying_tells_JARVIS_and_his_Denied_line_reaches_everyone_as_MessageEdited()
+    {
+        var h = await OnAsync();
+        var home = await h.HomeAsync();
+        var asked = await h.SendAsync(h.Member, home, "@Jarvis usuń listę Zakupy");
+        var reference = $"{home}/{asked.Id}";
+        var confirmation = Guid.NewGuid();
+        await AnswerAsync(Assist(home).InvocationId, reference, "Czeka na potwierdzenie.",
+            new AssistantAction("todo_delete_list {\"name\":\"Zakupy\"}", "NeedsConfirmation", null, confirmation, factory.Time.GetUtcNow().AddMinutes(10)));
+        var card = (await h.MessagesAsync(h.Member, home)).Single(m => m.AuthorKind == AuthorKind.Assistant);
+        await using var other = await factory.ConnectAsync(h.Other);
+        var hears = new Signals(other, SignalNames.MessageEdited);
+        await other.InvokeAsync("Watch", h.Id);
+
+        (await h.As(h.Member).PostAsJsonAsync($"{h.Api}/messages/{card.Id}/actions/{confirmation}", new { approve = false })).EnsureSuccessStatusCode();
+        await AnswerAsync(confirmation, reference, "Dobrze, nie usuwam.", new AssistantAction("todo_delete_list {\"name\":\"Zakupy\"}", "Denied", null, confirmation, null));
+
+        Assert.False(factory.Published.OfType<AssistantConfirmed>().Single(c => c.ConfirmationId == confirmation).Approved);
+        var edited = await hears.WaitForAsync(SignalNames.MessageEdited);
+        Assert.Equal(card.Id, edited.GetProperty("messageId").GetGuid());
+        var now = (await h.MessagesAsync(h.Other, home)).Single(m => m.AuthorKind == AuthorKind.Assistant);
+        Assert.Equal("Denied", Assert.Single(now.Actions).Status);
+    }
+
+    [Fact]
     public async Task A_second_decision_on_the_same_action_is_refused_and_the_action_runs_only_once()
     {
         var h = await OnAsync();
