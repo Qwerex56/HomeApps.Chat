@@ -108,6 +108,6 @@ export default {
     until: 'do {time}',
     expired: 'Wygasło, poproś jeszcze raz.',
     waitsForAsker: 'Czeka na potwierdzenie osoby, która prosiła.',
-    status: { Done: 'Zrobione', Failed: 'Nie udało się', NeedsConfirmation: 'Czeka', Denied: 'Anulowane', Expired: 'Wygasło' },
+    status: { Done: 'Zrobione', Failed: 'Nie udało się', NeedsConfirmation: 'Czeka na potwierdzenie', Denied: 'Anulowane', Expired: 'Wygasło' },
   },
 }
