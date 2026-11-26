@@ -42,7 +42,7 @@ public static class ChatPlugin
     {
         Id = "chat",
         Version = typeof(ChatPlugin).Assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "1.0.0",
-        MinHomeAppsVersion = "2.3.0",
+        MinHomeAppsVersion = "3.0.0",
         Name = new LocalizedText("Czat", "Chat"),
         Description = new LocalizedText("Rozmowy domowników: tekst, zdjęcia i filmy", "Household conversations: text, photos and videos"),
         Icon = "pi-comments",

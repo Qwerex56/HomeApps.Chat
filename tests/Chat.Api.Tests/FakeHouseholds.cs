@@ -33,7 +33,7 @@ public sealed class FakeHouseholds : HttpMessageHandler
 
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var segments = request.RequestUri!.AbsolutePath.Trim('/').Split('/');
+        var segments = request.RequestUri!.AbsolutePath.Trim('/').Split('/').Where(s => s != "v1").ToArray();
         var caller = SubjectOf(request.Headers.Authorization?.ToString());
         if (segments.Length == 1)
         {
