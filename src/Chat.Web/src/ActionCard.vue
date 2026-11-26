@@ -15,6 +15,7 @@ const emit = defineEmits<{
 }>()
 const host = useHost()
 const busy = ref<string | null>(null)
+const busyApprove = ref(true)
 
 const icons: Record<string, string> = {
   Done: 'pi pi-check-circle',
@@ -33,13 +34,17 @@ const statusOf = (action: AssistantAction) =>
 function decide(action: AssistantAction, approve: boolean) {
   if (!action.confirmationId) return
   busy.value = action.confirmationId
+  busyApprove.value = approve
   emit('decide', action.confirmationId, approve, () => (busy.value = null))
 }
 
 // The decision is in flight until JARVIS's answer changes the card line (MessageEdited), not until the POST returns.
 watch(
   () => props.actions.map((a) => a.status).join(),
-  () => (busy.value = null),
+  () => {
+    const pending = props.actions.find((a) => a.confirmationId === busy.value)
+    if (!pending || pending.status !== 'NeedsConfirmation') busy.value = null
+  },
 )
 </script>
 
@@ -59,13 +64,14 @@ watch(
         <Button
           :label="host.t('assistant.confirm')"
           size="small"
-          :loading="busy === action.confirmationId"
+          :loading="busy === action.confirmationId && busyApprove"
           @click="decide(action, true)"
         />
         <Button
           :label="host.t('assistant.cancel')"
           size="small"
           severity="secondary"
+          :loading="busy === action.confirmationId && !busyApprove"
           :disabled="busy === action.confirmationId"
           @click="decide(action, false)"
         />
